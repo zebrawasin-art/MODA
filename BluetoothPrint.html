@@ -1,12 +1,22 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-	<title>Bluetooth Printer via BrowserPrint (Zebra / ZPL)</title>
+	<title>MODA Bluetooth Print - Zebra ZPL</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 	<script type="text/javascript" src="./BrowserPrint-3.1.250.min.js"></script>
 	<style>
+		:root {
+			--primary-color: #0066cc;
+			--secondary-color: #6c757d;
+			--success-color: #28a745;
+			--danger-color: #dc3545;
+			--warning-color: #ffc107;
+			--light-bg: #f0f2f5;
+			--card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		}
+
 		* {
 			margin: 0;
 			padding: 0;
@@ -14,19 +24,19 @@
 		}
 		
 		body {
-			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-			background: #f0f2f5;
+			font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+			background: var(--light-bg);
 			min-height: 100vh;
-			padding: 20px;
+			padding: 10px;
 			color: #333;
 		}
 		
 		.container {
 			background: #ffffff;
-			border-radius: 10px;
-			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-			padding: 25px;
-			max-width: 1000px;
+			border-radius: 12px;
+			box-shadow: var(--card-shadow);
+			padding: 20px;
+			max-width: 800px;
 			margin: 0 auto;
 		}
 		
@@ -34,626 +44,319 @@
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			margin-bottom: 25px;
-			padding-bottom: 18px;
-			border-bottom: 1px solid #e8e8e8;
+			margin-bottom: 20px;
+			padding-bottom: 15px;
+			border-bottom: 1px solid #eee;
+			flex-wrap: wrap;
+			gap: 15px;
 		}
 		
 		.logo {
-			font-size: 1.5rem;
-			font-weight: 600;
+			font-size: 1.4rem;
+			font-weight: 700;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+		
+		.logo i { color: var(--primary-color); }
+		
+		.nav-buttons { display: flex; gap: 8px; }
+		
+		.btn-nav {
+			background: #f8f9fa;
 			color: #333;
+			border: 1px solid #ddd;
+			padding: 8px 12px;
+			border-radius: 6px;
+			text-decoration: none;
+			font-size: 0.85rem;
+			display: flex;
+			align-items: center;
+			gap: 5px;
+		}
+
+		.card {
+			background: #fff;
+			border-radius: 8px;
+			padding: 15px;
+			margin-bottom: 15px;
+			border: 1px solid #eee;
+		}
+		
+		.section-title {
+			font-size: 1rem;
+			font-weight: 600;
+			margin-bottom: 12px;
 			display: flex;
 			align-items: center;
 			gap: 8px;
 		}
 		
-		.logo i {
-			font-size: 1.4rem;
-			color: #0066cc;
-		}
-		
-		.nav-buttons {
-			display: flex;
-			gap: 12px;
-		}
-		
-		.back-btn, .switch-btn {
-			background: #f0f0f0;
-			color: #333;
-			border: 1px solid #ddd;
-			padding: 10px 18px;
-			border-radius: 4px;
-			cursor: pointer;
-			text-decoration: none;
-			transition: all 0.2s ease;
-			display: flex;
-			align-items: center;
-			gap: 5px;
-			font-size: 0.9rem;
-			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-		}
-		
-		.back-btn:hover, .switch-btn:hover {
-			background: #e0e0e0;
-			box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-		}
-		
-		.connection-section {
-			background: #fff;
-			border-radius: 6px;
-			padding: 18px;
-			margin-bottom: 20px;
-			border: 1px solid #eaeaea;
-			box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-		}
-		
-		.section-title {
-			font-size: 1.2rem;
-			font-weight: 600;
-			color: #333;
-			margin-bottom: 15px;
-			display: flex;
-			align-items: center;
-		}
-		
-		.section-icon {
-			font-size: 1.2rem;
-			margin-right: 8px;
-			color: #666;
-		}
-		
 		.info-box {
-			background: #f9f9f9;
-			border: 1px solid #eee;
-			border-radius: 4px;
-			padding: 12px;
+			background: #e7f3ff;
+			border-left: 4px solid var(--primary-color);
+			padding: 10px;
 			margin-bottom: 15px;
-			font-size: 0.9rem;
-			color: #555;
-		}
-		
-		.form-group {
-			margin-bottom: 15px;
-		}
-		
-		.form-row {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 15px;
-			margin-bottom: 15px;
+			font-size: 0.8rem;
 		}
 		
 		label {
 			display: block;
-			font-weight: 500;
-			color: #555;
+			font-weight: 600;
 			margin-bottom: 5px;
-			font-size: 0.9rem;
+			font-size: 0.85rem;
 		}
 		
-		select {
+		select, textarea {
 			width: 100%;
-			padding: 8px 12px;
+			padding: 10px;
 			border: 1px solid #ddd;
-			border-radius: 4px;
+			border-radius: 6px;
 			font-size: 0.9rem;
-			transition: all 0.2s ease;
-			background: white;
 		}
 		
-		select:focus {
-			outline: none;
-			border-color: #0066cc;
-			box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
-		}
-		
-		.btn-group {
-			display: flex;
+		.btn-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
 			gap: 10px;
-			margin-top: 15px;
+			margin-top: 10px;
 		}
 		
 		.btn {
-			padding: 10px 20px;
-			border-radius: 4px;
-			font-weight: 500;
+			padding: 12px;
+			border-radius: 6px;
+			font-weight: 600;
 			cursor: pointer;
-			transition: all 0.2s ease;
 			border: none;
-			font-size: 0.9rem;
+			font-size: 0.85rem;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			gap: 5px;
+			gap: 8px;
 		}
 		
-		.btn i {
-			font-size: 0.9rem;
-		}
+		.btn-primary { background: var(--primary-color); color: white; }
+		.btn-success { background: var(--success-color); color: white; }
+		.btn-secondary { background: var(--secondary-color); color: white; }
+		.btn-warning { background: var(--warning-color); color: #212529; }
 		
-		.btn-primary {
-			background: #0066cc;
-			color: white;
-			box-shadow: 0 2px 4px rgba(0, 102, 204, 0.2);
-		}
-		
-		.btn-primary:hover {
-			background: #0055b3;
-			box-shadow: 0 4px 8px rgba(0, 102, 204, 0.3);
-		}
-		
-		.btn-primary:disabled {
-			background: #99c2ff;
-			cursor: not-allowed;
-			box-shadow: none;
-		}
-		
-		.btn-secondary {
-			background: #f0f0f0;
-			color: #333;
-			border: 1px solid #ddd;
-			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-		}
-		
-		.btn-secondary:hover {
-			background: #e0e0e0;
-			box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-		}
-		
-		.btn-secondary:disabled {
-			background: #f9f9f9;
-			color: #999;
-			cursor: not-allowed;
-			box-shadow: none;
-		}
-		
-		.status-section {
-			background: #fff;
-			border-radius: 6px;
-			padding: 18px;
-			margin-bottom: 20px;
-			border: 1px solid #eaeaea;
-			box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-		}
-		
-		.status-item {
-			display: flex;
-			align-items: center;
-			margin-bottom: 10px;
-		}
-		
-		.status-label {
-			width: 150px;
-			font-weight: 500;
-			color: #555;
-			font-size: 0.9rem;
-		}
-		
-		.status-value {
-			font-size: 0.9rem;
+		.status-badge {
 			padding: 4px 10px;
-			border-radius: 4px;
-			background: #f0f0f0;
-			color: #333;
+			border-radius: 20px;
+			font-size: 0.7rem;
+			font-weight: 700;
 		}
 		
-		.status-connected {
-			background: #e6f4ea;
-			color: #137333;
-		}
+		.status-connected { background: #d4edda; color: #155724; }
+		.status-disconnected { background: #f8d7da; color: #721c24; }
 		
-		.status-disconnected {
-			background: #fce8e6;
-			color: #c5221f;
+		.zpl-editor { height: 150px; font-family: monospace; background: #f8f9fa; }
+		.log-editor { height: 100px; font-family: monospace; background: #222; color: #0f0; font-size: 0.75rem; }
+
+		.preview-box {
+			text-align: center;
+			padding: 10px;
+			background: #f8f9fa;
+			border: 1px dashed #ccc;
+			border-radius: 8px;
 		}
+
+		.preview-box img { max-width: 100%; height: auto; }
 		
-		.zpl-section {
-			background: #fff;
-			border-radius: 6px;
-			padding: 18px;
-			margin-bottom: 20px;
-			border: 1px solid #eaeaea;
-			box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-		}
-		
-		.zpl-editor {
-			width: 100%;
-			height: 200px;
-			padding: 12px;
-			border: 1px solid #ddd;
-			border-radius: 4px;
-			font-family: 'Courier New', monospace;
-			font-size: 0.9rem;
-			resize: vertical;
-			transition: all 0.2s ease;
-			background: #f9f9f9;
-		}
-		
-		.zpl-editor:focus {
-			outline: none;
-			border-color: #0066cc;
-			box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
-			background: white;
-		}
-		
-		.log-section {
-			background: #fff;
-			border-radius: 6px;
-			padding: 18px;
-			margin-bottom: 20px;
-			border: 1px solid #eaeaea;
-			box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-		}
-		
-		.log-editor {
-			width: 100%;
-			height: 150px;
-			padding: 12px;
-			border: 1px solid #ddd;
-			border-radius: 4px;
-			font-family: 'Courier New', monospace;
-			font-size: 0.9rem;
-			resize: vertical;
-			background: #f9f9f9;
-			color: #333;
-		}
-		
-		.alert {
-			position: fixed;
-			top: 20px;
-			right: 20px;
-			padding: 15px 20px;
-			border-radius: 4px;
-			color: white;
-			font-size: 0.9rem;
-			box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-			z-index: 1000;
-			animation: slideIn 0.3s ease-out forwards;
-		}
-		
-		@keyframes slideIn {
-			from { transform: translateX(100%); opacity: 0; }
-			to { transform: translateX(0); opacity: 1; }
-		}
-		
-		.alert-success {
-			background: #137333;
-		}
-		
-		.alert-error {
-			background: #c5221f;
-		}
-		
-		.alert-info {
-			background: #1a73e8;
+		@media print {
+			.nav-buttons, .connection-section, .btn-grid, .zpl-section, .log-section, .header, .info-box {
+				display: none !important;
+			}
+			body { background: white; padding: 0; }
+			.container { box-shadow: none; border: none; padding: 0; width: 100%; }
+			.preview-box { border: none; padding: 0; }
 		}
 	</style>
 	<script type="text/javascript">
 		var selected_device;
-		var devices = [];
+		var btChar; 
 		var logEl;
-		
-		function setup() {
-			//Get the default device from the application as a first step. Discovery takes longer to complete.
-			BrowserPrint.getDefaultDevice("printer", function(device) {
-				//Add device to list of devices and to html select element
-				selected_device = device;
-				devices.push(device);
-				var html_select = document.getElementById("selected_device");
-				var option = document.createElement("option");
-				option.text = device.name;
-				option.value = device.uid;
-				html_select.add(option);
-				
-				log('พบเครื่องพิมพ์เริ่มต้น: ' + device.name);
-				updateStatus('พร้อมใช้งาน');
-				document.getElementById('btnPrintBt').disabled = false;
-				
-				//Discover any other devices available to the application
-				BrowserPrint.getLocalDevices(function(device_list){
-					for(var i = 0; i < device_list.length; i++) {
-						//Add device to list of devices and to html select element
-						var device = device_list[i];
-						if(!selected_device || device.uid != selected_device.uid) {
-							devices.push(device);
-							var option = document.createElement("option");
-							option.text = device.name;
-							option.value = device.uid;
-							html_select.add(option);
-							log('พบเครื่องพิมพ์: ' + device.name);
-						}
-					}
-				}, function(){alert("Error getting local devices")},"printer");
-			}, function(error){
-				alert('ไม่พบเครื่องพิมพ์: ' + error);
-				log('ไม่พบเครื่องพิมพ์: ' + error, true);
-			})
-		}
-		
-		function getConfig(){
-			BrowserPrint.getApplicationConfiguration(function(config){
-				alert(JSON.stringify(config, null, 2));
-				log('การตั้งค่า BrowserPrint: ' + JSON.stringify(config, null, 2));
-			}, function(error){
-				alert(JSON.stringify(new BrowserPrint.ApplicationConfiguration()));
-			})
-		}
-		
-		function writeToSelectedPrinter(dataToWrite) {
-			if (!selected_device) {
-				showError('กรุณาเลือกเครื่องพิมพ์');
-				return;
-			}
-			selected_device.send(dataToWrite, undefined, errorCallback);
-		}
-		
-		var readCallback = function(readData) {
-			if(readData === undefined || readData === null || readData === "") {
-				alert("No Response from Device");
-			} else {
-				alert(readData);
-			}
-		}
-		
-		var errorCallback = function(errorMessage){
-			alert("Error: " + errorMessage);
-			log("Error: " + errorMessage, true);
-		}
-		
-		function readFromSelectedPrinter() {
-			if (!selected_device) {
-				showError('กรุณาเลือกเครื่องพิมพ์');
-				return;
-			}
-			selected_device.read(readCallback, errorCallback);
-		}
-		
-		function getDeviceCallback(deviceList) {
-			alert("Devices: \n" + JSON.stringify(deviceList, null, 4))
-		}
-		
-		function sendImage(imageUrl) {
-			if (!selected_device) {
-				showError('กรุณาเลือกเครื่องพิมพ์');
-				return;
-			}
-			url = window.location.href.substring(0, window.location.href.lastIndexOf("/"));
-			url = url + "/" + imageUrl;
-			selected_device.convertAndSendFile(url, undefined, errorCallback)
-		}
-		
-		function sendFile(fileUrl){
-			if (!selected_device) {
-				showError('กรุณาเลือกเครื่องพิมพ์');
-				return;
-			}
-			url = window.location.href.substring(0, window.location.href.lastIndexOf("/"));
-			url = url + "/" + fileUrl;
-			selected_device.sendFile(url, undefined, errorCallback)
-		}
-		
-		function onDeviceSelected(selected) {
-			for(var i = 0; i < devices.length; ++i){
-				if(selected.value == devices[i].uid) {
-					selected_device = devices[i];
-					log('เลือกเครื่องพิมพ์: ' + selected_device.name);
-					updateStatus('เลือกเครื่องพิมพ์: ' + selected_device.name);
-					document.getElementById('btnPrintBt').disabled = false;
-					return;
-				}
-			}
-		}
-		
-		function discoverPrinters() {
-			log('กำลังค้นหาเครื่องพิมพ์...');
-			updateStatus('กำลังค้นหาเครื่องพิมพ์...');
-			
-			// Clear existing options except the first one
-			var html_select = document.getElementById("selected_device");
-			while(html_select.options.length > 1) {
-				html_select.remove(1);
-			}
-			devices = [];
-			selected_device = null;
-			
-			setup();
-		}
-		
-		function printZpl() {
-			if (!selected_device) {
-				showError('กรุณาเลือกเครื่องพิมพ์');
-				return;
-			}
-			
-			const zplCode = document.getElementById('txtZpl').value;
-			if (!zplCode.trim()) {
-				showError('กรุณาใส่ ZPL code');
-				return;
-			}
-			
-			log('กำลังส่ง ZPL ไปยังเครื่องพิมพ์: ' + selected_device.name);
-			updateStatus('กำลังพิมพ์...');
-			
-			selected_device.send(zplCode, function(){
-				log('ส่ง ZPL สำเร็จ');
-				showSuccess('ส่ง ZPL สำเร็จ');
-				updateStatus('พิมพ์สำเร็จ');
-			}, function(error){
-				log('เกิดข้อผิดพลาดในการพิมพ์: ' + error, true);
-				showError('เกิดข้อผิดพลาดในการพิมพ์: ' + error);
-				updateStatus('เกิดข้อผิดพลาด');
-			});
-		}
-		
-		function log(message, isError = false) {
-			const now = new Date();
-			const timestamp = now.toLocaleTimeString();
-			const logMessage = `[${timestamp}] ${message}`;
+
+		function log(msg) {
+			const ts = new Date().toLocaleTimeString();
 			if (logEl) {
-				logEl.value += logMessage + '\n';
+				logEl.value += `[${ts}] ${msg}\n`;
 				logEl.scrollTop = logEl.scrollHeight;
 			}
-			
-			if (isError) {
-				console.error(message);
-			} else {
-				console.log(message);
+			console.log(msg);
+		}
+
+		function updateStatus(msg, connected) {
+			document.getElementById('lblStatus').textContent = msg;
+			const badge = document.getElementById('statusBadge');
+			badge.textContent = connected ? 'CONNECTED' : 'DISCONNECTED';
+			badge.className = 'status-badge ' + (connected ? 'status-connected' : 'status-disconnected');
+		}
+
+		// Zebra BrowserPrint Setup
+		function setupBrowserPrint() {
+			log('กำลังตรวจหา BrowserPrint...');
+			BrowserPrint.getDefaultDevice("printer", function(device) {
+				selected_device = device;
+				log('พบเครื่องพิมพ์ BrowserPrint: ' + device.name);
+				updateStatus('พร้อมใช้งาน (' + device.name + ')', true);
+				
+				var html_select = document.getElementById("selected_device");
+				var option = document.createElement("option");
+				option.text = device.name + " (Default)";
+				option.value = device.uid;
+				html_select.add(option);
+			}, function(err) {
+				log('ไม่พบ BrowserPrint service');
+			});
+		}
+
+		// Web Bluetooth API
+		async function connectBluetooth() {
+			try {
+				log('กำลังค้นหา Bluetooth Device...');
+				const device = await navigator.bluetooth.requestDevice({
+					filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }, { namePrefix: 'Zebra' }],
+					optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+				});
+
+				log('กำลังเชื่อมต่อ GATT...');
+				const server = await device.gatt.connect();
+				const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+				btChar = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+				
+				log('เชื่อมต่อ Bluetooth สำเร็จ: ' + device.name);
+				updateStatus('เชื่อมต่อ Bluetooth แล้ว', true);
+				
+				device.addEventListener('gattserverdisconnected', () => {
+					log('Bluetooth ตัดการเชื่อมต่อ');
+					updateStatus('Disconnected', false);
+					btChar = null;
+				});
+			} catch (err) {
+				log('Bluetooth Error: ' + err.message);
+				alert('เชื่อมต่อไม่สำเร็จ: ' + err.message);
 			}
 		}
-		
-		function updateStatus(message) {
-			const statusEl = document.getElementById('btStatus');
-			if (statusEl) {
-				statusEl.textContent = message;
+
+		async function printZpl() {
+			const zpl = document.getElementById('txtZpl').value;
+			if (!zpl.trim()) return alert('กรุณาใส่ ZPL');
+
+			// 1. Try Web Bluetooth
+			if (btChar) {
+				log('กำลังพิมพ์ผ่าน Web Bluetooth...');
+				try {
+					const encoder = new TextEncoder();
+					const data = encoder.encode(zpl);
+					const chunk = 20;
+					for (let i = 0; i < data.length; i += chunk) {
+						await btChar.writeValue(data.slice(i, i + chunk));
+					}
+					log('พิมพ์สำเร็จ (Bluetooth)');
+					return;
+				} catch (err) { log('Bluetooth Print Error: ' + err.message); }
 			}
-			
-			const lblStatus = document.getElementById('lblStatus');
-			if (lblStatus) {
-				lblStatus.textContent = message;
+
+			// 2. Try BrowserPrint
+			if (selected_device) {
+				log('กำลังพิมพ์ผ่าน BrowserPrint...');
+				selected_device.send(zpl, () => log('พิมพ์สำเร็จ (BrowserPrint)'), (err) => log('Error: ' + err));
+				return;
 			}
+
+			alert('กรุณาเชื่อมต่อเครื่องพิมพ์ก่อน');
+		}
+
+		function updatePreview() {
+			const zpl = document.getElementById('txtZpl').value;
+			const url = `https://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/${encodeURIComponent(zpl)}`;
+			document.getElementById('labelPreview').src = url;
+			log('อัปเดต Preview แล้ว');
 			
-			const lblBtStatus = document.getElementById('lblBtStatus');
-			if (lblBtStatus) {
-				lblBtStatus.textContent = selected_device ? 'Connected' : 'Disconnected';
-				lblBtStatus.className = selected_device ? 'status-value status-connected' : 'status-value status-disconnected';
-			}
+			// Save to localStorage
+			localStorage.setItem('moda_latest_zpl', zpl);
 		}
-		
-		function showAlert(message, type) {
-			const alertDiv = document.createElement('div');
-			alertDiv.className = `alert alert-${type}`;
-			alertDiv.textContent = message;
-			document.body.appendChild(alertDiv);
-			
-			setTimeout(function() {
-				alertDiv.remove();
-			}, 5000);
-		}
-		
-		function showSuccess(message) {
-			showAlert(message, 'success');
-		}
-		
-		function showError(message) {
-			showAlert(message, 'error');
-		}
-		
-		function showInfo(message) {
-			showAlert(message, 'info');
-		}
-		
+
 		function init() {
-			// Initialize DOM elements
 			logEl = document.getElementById('log');
 			
-			// Add event listeners
-			document.getElementById('btnDiscoverPrinters').addEventListener('click', discoverPrinters);
-			document.getElementById('btnGetConfig').addEventListener('click', getConfig);
-			document.getElementById('btnPrintBt').addEventListener('click', printZpl);
-			document.getElementById('selected_device').addEventListener('change', function() {
-				onDeviceSelected(this);
-			});
-			
-			// Initialize BrowserPrint
-			log('เริ่มต้นระบบ BrowserPrint...');
-			updateStatus('กำลังเริ่มต้นระบบ...');
-			
-			// Auto-discover printers on load
-			setTimeout(setup, 1000);
+			// Load latest ZPL
+			const saved = localStorage.getItem('moda_latest_zpl');
+			if (saved) document.getElementById('txtZpl').value = saved;
+
+			document.getElementById('btnBluetooth').addEventListener('click', connectBluetooth);
+			document.getElementById('btnPrint').addEventListener('click', printZpl);
+			document.getElementById('btnPreview').addEventListener('click', updatePreview);
+			document.getElementById('btnSystemPrint').addEventListener('click', () => window.print());
+
+			setTimeout(setupBrowserPrint, 1000);
+			updatePreview();
 		}
-		
-		// Initialize when page loads
+
 		window.onload = init;
-		document.addEventListener('DOMContentLoaded', init);
 	</script>
 </head>
 <body>
-	<form id="form1">
-		<div class="container">
-			<div class="header">
-				<div class="logo"><i class="fab fa-bluetooth-b"></i> Bluetooth Printer via BrowserPrint (Zebra / ZPL)</div>
-				<div class="nav-buttons">
-					<a href="WifiPrint.html" class="switch-btn"><i class="fas fa-wifi"></i> สลับไปใช้ WiFi</a>
-					<a href="index.html" class="back-btn"><i class="fas fa-home"></i> หน้าหลัก</a>
-				</div>
-			</div>
-			
-			<!-- Printer Discovery Section -->
-			<div class="connection-section">
-				<div class="section-title">
-					<span class="section-icon"><i class="fas fa-search"></i></span>
-					ค้นหาเครื่องพิมพ์
-				</div>
-				<div class="info-box">
-					<strong>คำแนะนำการใช้งาน:</strong><br/>
-					• ติดตั้ง Zebra Browser Print Service บนเครื่องคอมพิวเตอร์<br/>
-					• เชื่อมต่อเครื่องพิมพ์ผ่าน Bluetooth หรือ WiFi<br/>
-					• กดปุ่ม "ค้นหาเครื่องพิมพ์" เพื่อค้นหาเครื่องพิมพ์ที่พร้อมใช้งาน
-				</div>
-				<div class="form-row">
-					<div class="form-group">
-						<label for="selected_device">เลือกเครื่องพิมพ์:</label>
-						<select id="selected_device">
-							<option value="">-- กรุณาเลือกเครื่องพิมพ์ --</option>
-						</select>
-					</div>
-					<div class="form-group">
-						<label>Status:</label>
-						<span id="btStatus" style="font-size: 0.9rem; color: #666;">Ready to discover</span>
-					</div>
-				</div>
-				<div class="btn-group">
-					<button type="button" id="btnDiscoverPrinters" class="btn btn-primary">ค้นหาเครื่องพิมพ์</button>
-					<button type="button" id="btnGetConfig" class="btn btn-secondary">ดูการตั้งค่า</button>
-					<button type="button" id="btnPrintBt" class="btn btn-primary" disabled>Print</button>
-				</div>
-			</div>
-			
-			<!-- Status Section -->
-			<div class="status-section">
-				<div class="section-title">
-					<span class="section-icon"><i class="fas fa-chart-line"></i></span>
-					สถานะการเชื่อมต่อ
-				</div>
-				<div class="status-item">
-					<span class="status-label">Bluetooth Status:</span>
-					<span id="lblBtStatus" class="status-value status-disconnected">Disconnected</span>
-				</div>
-				<div class="status-item">
-					<span class="status-label">Status:</span>
-					<span id="lblStatus" class="status-value">Idle</span>
-				</div>
-			</div>
-			
-			<!-- ZPL Section -->
-			<div class="zpl-section">
-				<div class="section-title">
-					<span class="section-icon"><i class="fas fa-code"></i></span>
-					ZPL
-				</div>
-				<textarea id="txtZpl" class="zpl-editor">^XA
-^TA000
-^PW600
-^LL300
-^FO40,40^A0N,40,40^FDIDENTIFY TAG^FS
-^FO40,90^A0N,28,28^FDPART NO. RCX316D005^FS
-^FO40,130^A0N,28,28^FDPART NAME. PLATE,SIDE(R) #1^FS
-^FO40,170^A0N,28,28^FDQTY. 5 PCS^FS
-^FO40,210^BQN,2,4^FDLA,RCX316D005^FS
-^PQ1,1,1,Y
-^XZ</textarea>
-			</div>
-			
-			<!-- Log Section -->
-			<div class="log-section">
-				<div class="section-title">
-					<span class="section-icon"><i class="fas fa-list-alt"></i></span>
-					Log
-				</div>
-				<textarea id="log" class="log-editor" readonly></textarea>
+	<div class="container">
+		<div class="header">
+			<div class="logo"><i class="fab fa-bluetooth-b"></i> MODA Bluetooth</div>
+			<div class="nav-buttons">
+				<a href="WifiPrint.html" class="btn-nav"><i class="fas fa-wifi"></i> WiFi</a>
+				<a href="index.html" class="btn-nav"><i class="fas fa-home"></i> Home</a>
 			</div>
 		</div>
-	</form>
+
+		<div class="info-box">
+			<strong>Android:</strong> แนะนำให้ใช้ <b>Connect Bluetooth</b> (Web Bluetooth) หรือ <b>System Print</b> หาก BrowserPrint ไม่ทำงาน
+		</div>
+
+		<div class="card">
+			<div class="section-title"><i class="fas fa-link"></i> เชื่อมต่อ</div>
+			<label>เครื่องพิมพ์ (PC/App):</label>
+			<select id="selected_device">
+				<option value="">-- ตรวจหาอัตโนมัติ --</option>
+			</select>
+			<div class="btn-grid">
+				<button id="btnBluetooth" class="btn btn-primary"><i class="fab fa-bluetooth"></i> Connect Bluetooth</button>
+			</div>
+		</div>
+
+		<div class="card">
+			<div class="section-title"><i class="fas fa-info-circle"></i> สถานะ: <span id="lblStatus">Idle</span></div>
+			<span id="statusBadge" class="status-badge status-disconnected">DISCONNECTED</span>
+		</div>
+
+		<div class="card">
+			<div class="section-title"><i class="fas fa-code"></i> ZPL Code</div>
+			<textarea id="txtZpl" class="zpl-editor">^XA
+^PW600
+^LL300
+^FO40,40^A0N,40,40^FDMODA LABEL^FS
+^FO40,90^A0N,28,28^FDPART NO: RCX316D005^FS
+^FO40,130^A0N,28,28^FDBARCODE:^FS
+^FO40,160^BCN,60,Y,N,N^FD123456789^FS
+^PQ1,1,1,Y
+^XZ</textarea>
+			<div class="btn-grid">
+				<button id="btnPreview" class="btn btn-secondary"><i class="fas fa-eye"></i> Preview</button>
+				<button id="btnPrint" class="btn btn-success"><i class="fas fa-print"></i> พิมพ์ ZPL</button>
+				<button id="btnSystemPrint" class="btn btn-warning"><i class="fas fa-mobile-alt"></i> System Print</button>
+			</div>
+		</div>
+
+		<div class="card">
+			<div class="section-title"><i class="fas fa-image"></i> Label Preview</div>
+			<div class="preview-box">
+				<img id="labelPreview" src="" alt="Preview">
+			</div>
+		</div>
+
+		<div class="card">
+			<div class="section-title"><i class="fas fa-terminal"></i> Log</div>
+			<textarea id="log" class="log-editor" readonly></textarea>
+		</div>
+	</div>
 </body>
 </html>
