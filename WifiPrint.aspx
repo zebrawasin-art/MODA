@@ -161,7 +161,24 @@
 
 		.preview-box img { max-width: 100%; height: auto; }
 		
+		.paper-size-group {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 10px;
+			margin-bottom: 15px;
+		}
+
+		.input-small {
+			padding: 8px;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			font-size: 0.85rem;
+			width: 100%;
+		}
+
 		@media print {
+			@page { margin: 0; }
+			body { margin: 0; padding: 0; }
 			body * { visibility: hidden; }
 			.preview-box, .preview-box img { visibility: visible; }
 			.preview-box {
@@ -177,7 +194,11 @@
 				border: none !important;
 				padding: 0 !important;
 			}
-			.preview-box img { max-width: 100%; max-height: 100%; }
+			.preview-box img { 
+				width: 100%; 
+				height: auto; 
+				display: block;
+			}
 		}
 	</style>
 	<script type="text/javascript">
@@ -207,23 +228,56 @@
 				log('พบเครื่องพิมพ์ WiFi/Network: ' + device.name);
 				updateStatus('พร้อมใช้งาน (' + device.name + ')', true);
 				
-				var html_select = document.getElementById("selected_device");
-				var option = document.createElement("option");
-				option.text = device.name + " (Default)";
-				option.value = device.uid;
-				html_select.add(option);
+				updatePrinterDropdown(device);
 			}, function(err) {
 				log('ไม่พบ BrowserPrint service');
 			});
+		}
+
+		function findLocalPrinters() {
+			log('กำลังค้นหาเครื่องพิมพ์ในระบบ (Local)...');
+			BrowserPrint.getLocalDevices(function(device_list) {
+				const html_select = document.getElementById("selected_device");
+				html_select.innerHTML = '<option value="">-- เลือกเครื่องพิมพ์ --</option>';
+				
+				if (device_list.length > 0) {
+					device_list.forEach(device => {
+						updatePrinterDropdown(device);
+					});
+					log(`พบเครื่องพิมพ์ ${device_list.length} เครื่อง`);
+					showSuccess(`พบเครื่องพิมพ์ ${device_list.length} เครื่อง`);
+				} else {
+					log('ไม่พบเครื่องพิมพ์ในระบบ', true);
+					showError('ไม่พบเครื่องพิมพ์ในระบบ');
+				}
+			}, function(err) {
+				log('Error finding printers: ' + err, true);
+				showError('เกิดข้อผิดพลาดในการค้นหาเครื่องพิมพ์');
+			}, "printer");
+		}
+
+		function updatePrinterDropdown(device) {
+			const html_select = document.getElementById("selected_device");
+			const option = document.createElement("option");
+			option.text = device.name + (device.connection === "bluetooth" ? " (BT)" : " (USB/Network)");
+			option.value = device.uid;
+			html_select.add(option);
 		}
 
 		async function printZpl() {
 			const zpl = document.getElementById('<%= txtZpl.ClientID %>').value;
 			if (!zpl.trim()) return alert('กรุณาใส่ ZPL');
 
-			if (selected_device) {
-				log('กำลังพิมพ์ผ่าน BrowserPrint...');
-				selected_device.send(zpl, () => log('พิมพ์สำเร็จ'), (err) => log('Error: ' + err));
+			// If a device is selected from the dropdown
+			const html_select = document.getElementById("selected_device");
+			if (html_select.value) {
+				BrowserPrint.getLocalDevices(function(device_list) {
+					const device = device_list.find(d => d.uid === html_select.value);
+					if (device) {
+						log(`กำลังพิมพ์ผ่าน ${device.name}...`);
+						device.send(zpl, () => log('พิมพ์สำเร็จ'), (err) => log('Error: ' + err));
+					}
+				}, (err) => log('Error: ' + err), "printer");
 				return;
 			}
 
@@ -232,19 +286,30 @@
 
 		function updatePreview() {
 			const zpl = document.getElementById('<%= txtZpl.ClientID %>').value;
-			const url = `https://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/${encodeURIComponent(zpl)}`;
+			const width = document.getElementById('txtPaperWidth').value || 4;
+			const height = document.getElementById('txtPaperHeight').value || 6;
+			const url = `https://api.labelary.com/v1/printers/8dpmm/labels/${width}x${height}/0/${encodeURIComponent(zpl)}`;
 			document.getElementById('labelPreview').src = url;
-			log('อัปเดต Preview แล้ว');
+			log(`อัปเดต Preview แล้ว (${width}x${height} นิ้ว)`);
 			localStorage.setItem('moda_latest_zpl_wifi', zpl);
+			localStorage.setItem('moda_latest_width_wifi', width);
+			localStorage.setItem('moda_latest_height_wifi', height);
 		}
 
 		function systemPrint() {
 			const labelImg = document.getElementById('labelPreview');
 			if (!labelImg || !labelImg.src) return alert('กรุณากด Preview ก่อนพิมพ์');
 			
+			const width = document.getElementById('txtPaperWidth').value || 4;
+			const height = document.getElementById('txtPaperHeight').value || 6;
+			
 			const printWindow = window.open('', '_blank');
-			printWindow.document.write('<html><head><title>Print Label</title><style>body{margin:0;display:flex;justify-content:center;align-items:center;height:100vh;} img{max-width:100%;max-height:100%;}</style></head><body>');
-			printWindow.document.write('<img src="' + labelImg.src + '" onload="window.print();window.close();" />');
+			printWindow.document.write(`<html><head><title>Print Label</title><style>
+				@page { size: ${width}in ${height}in; margin: 0; }
+				body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; } 
+				img { width: 100%; height: auto; display: block; }
+			</style></head><body>`);
+			printWindow.document.write('<img src="' + labelImg.src + '" onload="window.print();setTimeout(() => window.close(), 500);" />');
 			printWindow.document.write('</body></html>');
 			printWindow.document.close();
 		}
@@ -253,7 +318,14 @@
 			logEl = document.getElementById('log');
 			const saved = localStorage.getItem('moda_latest_zpl_wifi');
 			if (saved) document.getElementById('<%= txtZpl.ClientID %>').value = saved;
+			
+			const savedWidth = localStorage.getItem('moda_latest_width_wifi');
+			if (savedWidth) document.getElementById('txtPaperWidth').value = savedWidth;
+			
+			const savedHeight = localStorage.getItem('moda_latest_height_wifi');
+			if (savedHeight) document.getElementById('txtPaperHeight').value = savedHeight;
 
+			document.getElementById('btnFindLocal').addEventListener('click', findLocalPrinters);
 			document.getElementById('btnPrint').addEventListener('click', printZpl);
 			document.getElementById('btnPreview').addEventListener('click', updatePreview);
 			document.getElementById('btnSystemPrint').addEventListener('click', systemPrint);
@@ -281,12 +353,34 @@
 			</div>
 
 			<div class="card">
-				<div class="section-title"><i class="fas fa-link"></i> เชื่อมต่อ</div>
+			<div class="section-title"><i class="fas fa-link"></i> เชื่อมต่อ</div>
+			<div class="form-group">
 				<label>เครื่องพิมพ์ (WiFi/Network):</label>
 				<select id="selected_device">
 					<option value="">-- ตรวจหาอัตโนมัติ --</option>
 				</select>
 			</div>
+			<div class="btn-grid">
+				<button type="button" id="btnFindLocal" class="btn btn-secondary"><i class="fas fa-search"></i> ค้นหาเครื่องพิมพ์ (PC)</button>
+			</div>
+		</div>
+
+		<div class="card">
+			<div class="section-title"><i class="fas fa-ruler-combined"></i> ตั้งค่าหน้ากระดาษ</div>
+			<div class="paper-size-group">
+				<div class="form-group">
+					<label>ความกว้าง (นิ้ว):</label>
+					<input type="number" id="txtPaperWidth" class="input-small" value="4" step="0.1" />
+				</div>
+				<div class="form-group">
+					<label>ความสูง (นิ้ว):</label>
+					<input type="number" id="txtPaperHeight" class="input-small" value="6" step="0.1" />
+				</div>
+			</div>
+			<div class="info-box" style="margin-bottom: 0;">
+				* ขนาดมาตรฐานทั่วไปคือ 4x6 นิ้ว
+			</div>
+		</div>
 
 			<div class="card">
 				<div class="section-title"><i class="fas fa-info-circle"></i> สถานะ: <span id="lblStatus">Idle</span></div>
