@@ -162,12 +162,22 @@
 		.preview-box img { max-width: 100%; height: auto; }
 		
 		@media print {
-			.nav-buttons, .connection-section, .btn-grid, .zpl-section, .log-section, .header, .info-box {
-				display: none !important;
+			body * { visibility: hidden; }
+			.preview-box, .preview-box img { visibility: visible; }
+			.preview-box {
+				position: absolute;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				background: white !important;
+				border: none !important;
+				padding: 0 !important;
 			}
-			body { background: white; padding: 0; }
-			.container { box-shadow: none; border: none; padding: 0; width: 100%; }
-			.preview-box { border: none; padding: 0; }
+			.preview-box img { max-width: 100%; max-height: 100%; }
 		}
 	</style>
 	<script type="text/javascript">
@@ -228,6 +238,17 @@
 			localStorage.setItem('moda_latest_zpl_wifi', zpl);
 		}
 
+		function systemPrint() {
+			const labelImg = document.getElementById('labelPreview');
+			if (!labelImg || !labelImg.src) return alert('กรุณากด Preview ก่อนพิมพ์');
+			
+			const printWindow = window.open('', '_blank');
+			printWindow.document.write('<html><head><title>Print Label</title><style>body{margin:0;display:flex;justify-content:center;align-items:center;height:100vh;} img{max-width:100%;max-height:100%;}</style></head><body>');
+			printWindow.document.write('<img src="' + labelImg.src + '" onload="window.print();window.close();" />');
+			printWindow.document.write('</body></html>');
+			printWindow.document.close();
+		}
+
 		function init() {
 			logEl = document.getElementById('log');
 			const saved = localStorage.getItem('moda_latest_zpl_wifi');
@@ -235,7 +256,7 @@
 
 			document.getElementById('btnPrint').addEventListener('click', printZpl);
 			document.getElementById('btnPreview').addEventListener('click', updatePreview);
-			document.getElementById('btnSystemPrint').addEventListener('click', () => window.print());
+			document.getElementById('btnSystemPrint').addEventListener('click', systemPrint);
 
 			setTimeout(setupBrowserPrint, 1000);
 			updatePreview();
