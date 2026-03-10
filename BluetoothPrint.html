@@ -8,234 +8,146 @@
 	<script type="text/javascript" src="./BrowserPrint-3.1.250.min.js"></script>
 	<style>
 		:root {
-			--primary-color: #0066cc;
-			--secondary-color: #6c757d;
-			--success-color: #28a745;
-			--danger-color: #dc3545;
-			--warning-color: #ffc107;
-			--light-bg: #f0f2f5;
-			--card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+			--primary: #0066cc;
+			--success: #28a745;
+			--danger:  #dc3545;
+			--warning: #e67e00;
+			--secondary: #6c757d;
+			--bg: #f0f2f5;
+			--shadow: 0 4px 12px rgba(0,0,0,0.1);
 		}
-
-		* { margin: 0; padding: 0; box-sizing: border-box; }
-
+		* { margin:0; padding:0; box-sizing:border-box; }
 		body {
 			font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-			background: var(--light-bg);
-			min-height: 100vh;
-			padding: 10px;
-			color: #333;
+			background: var(--bg); min-height:100vh; padding:10px; color:#333;
 		}
-
 		.container {
-			background: #ffffff;
-			border-radius: 12px;
-			box-shadow: var(--card-shadow);
-			padding: 20px;
-			max-width: 800px;
-			margin: 0 auto;
+			background:#fff; border-radius:12px; box-shadow:var(--shadow);
+			padding:20px; max-width:800px; margin:0 auto;
 		}
-
 		.header {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			margin-bottom: 20px;
-			padding-bottom: 15px;
-			border-bottom: 1px solid #eee;
-			flex-wrap: wrap;
-			gap: 15px;
+			display:flex; align-items:center; justify-content:space-between;
+			margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid #eee;
+			flex-wrap:wrap; gap:10px;
 		}
-
-		.logo {
-			font-size: 1.4rem;
-			font-weight: 700;
-			display: flex;
-			align-items: center;
-			gap: 10px;
-		}
-
-		.logo i { color: var(--primary-color); }
-		.nav-buttons { display: flex; gap: 8px; }
-
+		.logo { font-size:1.4rem; font-weight:700; display:flex; align-items:center; gap:8px; }
+		.logo i { color:var(--primary); }
+		.nav-buttons { display:flex; gap:8px; }
 		.btn-nav {
-			background: #f8f9fa;
-			color: #333;
-			border: 1px solid #ddd;
-			padding: 8px 12px;
-			border-radius: 6px;
-			text-decoration: none;
-			font-size: 0.85rem;
-			display: flex;
-			align-items: center;
-			gap: 5px;
+			background:#f8f9fa; color:#333; border:1px solid #ddd;
+			padding:7px 12px; border-radius:6px; text-decoration:none;
+			font-size:0.82rem; display:flex; align-items:center; gap:5px;
 		}
-
 		.card {
-			background: #fff;
-			border-radius: 8px;
-			padding: 15px;
-			margin-bottom: 15px;
-			border: 1px solid #eee;
+			background:#fff; border-radius:8px; padding:15px;
+			margin-bottom:14px; border:1px solid #eee;
 		}
-
 		.section-title {
-			font-size: 1rem;
-			font-weight: 600;
-			margin-bottom: 12px;
-			display: flex;
-			align-items: center;
-			gap: 8px;
+			font-size:0.97rem; font-weight:700; margin-bottom:12px;
+			display:flex; align-items:center; gap:8px; color:#222;
 		}
+		.info-box  { background:#e7f3ff; border-left:4px solid var(--primary); padding:10px; margin-bottom:12px; font-size:0.8rem; line-height:1.6; }
+		.warn-box  { background:#fff3cd; border-left:4px solid #ffc107;        padding:10px; margin-bottom:12px; font-size:0.8rem; line-height:1.6; }
+		.error-box { background:#fde8e8; border-left:4px solid var(--danger);  padding:10px; margin-bottom:12px; font-size:0.8rem; line-height:1.6; }
+		.ok-box    { background:#d4edda; border-left:4px solid var(--success);  padding:10px; margin-bottom:12px; font-size:0.8rem; line-height:1.6; }
 
-		.info-box {
-			background: #e7f3ff;
-			border-left: 4px solid var(--primary-color);
-			padding: 10px;
-			margin-bottom: 15px;
-			font-size: 0.8rem;
+		label { display:block; font-weight:600; margin-bottom:5px; font-size:0.84rem; }
+		input, select, textarea {
+			width:100%; padding:10px; border:1px solid #ddd;
+			border-radius:6px; font-size:0.9rem; font-family:inherit;
 		}
+		input:focus, select:focus, textarea:focus { outline:none; border-color:var(--primary); }
 
-		.warn-box {
-			background: #fff3cd;
-			border-left: 4px solid var(--warning-color);
-			padding: 10px;
-			margin-bottom: 10px;
-			font-size: 0.8rem;
-		}
-
-		label {
-			display: block;
-			font-weight: 600;
-			margin-bottom: 5px;
-			font-size: 0.85rem;
-		}
-
-		select, textarea {
-			width: 100%;
-			padding: 10px;
-			border: 1px solid #ddd;
-			border-radius: 6px;
-			font-size: 0.9rem;
-		}
-
-		.btn-grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-			gap: 10px;
-			margin-top: 10px;
-		}
+		.input-row { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:end; }
 
 		.btn {
-			padding: 12px;
-			border-radius: 6px;
-			font-weight: 600;
-			cursor: pointer;
-			border: none;
-			font-size: 0.85rem;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			gap: 8px;
-			transition: opacity 0.2s;
+			padding:11px 16px; border-radius:7px; font-weight:700; cursor:pointer;
+			border:none; font-size:0.85rem; display:inline-flex; align-items:center;
+			justify-content:center; gap:7px; transition:filter .15s;
+			white-space:nowrap; line-height:1.3; text-align:center;
 		}
+		.btn:active  { filter:brightness(.88); }
+		.btn:disabled { opacity:.5; cursor:not-allowed; }
+		.btn-primary   { background:var(--primary);   color:#fff; }
+		.btn-success   { background:var(--success);   color:#fff; }
+		.btn-secondary { background:var(--secondary); color:#fff; }
+		.btn-warning   { background:var(--warning);   color:#fff; }
+		.btn-danger    { background:var(--danger);    color:#fff; }
+		.btn-outline   { background:#fff; color:var(--primary); border:2px solid var(--primary); }
+		.btn-full { width:100%; }
+		.btn-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px; margin-top:10px; }
 
-		.btn:active { opacity: 0.75; }
-		.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+		/* Status */
+		.status-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+		.status-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; transition:background .3s; }
+		.dot-green  { background:#28a745; box-shadow:0 0 7px #28a74566; }
+		.dot-yellow { background:#ffc107; box-shadow:0 0 7px #ffc10766; animation:pulse 1s infinite; }
+		.dot-red    { background:#dc3545; }
+		@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
 
-		.btn-primary   { background: var(--primary-color); color: white; }
-		.btn-success   { background: var(--success-color); color: white; }
-		.btn-secondary { background: var(--secondary-color); color: white; }
-		.btn-warning   { background: var(--warning-color); color: #212529; }
-		.btn-danger    { background: var(--danger-color); color: white; }
-
-		.status-badge {
-			padding: 4px 10px;
-			border-radius: 20px;
-			font-size: 0.7rem;
-			font-weight: 700;
+		/* Method tabs */
+		.method-tabs {
+			display:flex; border:1.5px solid var(--primary); border-radius:9px;
+			overflow:hidden; margin-bottom:15px;
 		}
+		.method-tab {
+			flex:1; padding:10px 6px; font-size:0.82rem; font-weight:700;
+			text-align:center; cursor:pointer; background:#fff; color:var(--primary);
+			border:none; border-right:1px solid #c0d8f0; transition:background .15s;
+		}
+		.method-tab:last-child { border-right:none; }
+		.method-tab.active { background:var(--primary); color:#fff; }
 
-		.status-connected    { background: #d4edda; color: #155724; }
-		.status-disconnected { background: #f8d7da; color: #721c24; }
-		.status-connecting   { background: #fff3cd; color: #856404; }
-
-		.zpl-editor  { height: 150px; font-family: monospace; background: #f8f9fa; }
-		.log-editor  { height: 120px; font-family: monospace; background: #1a1a2e; color: #00ff88; font-size: 0.75rem; }
+		.zpl-editor { height:150px; font-family:monospace; background:#f8f9fa; font-size:.82rem; }
+		.log-editor { height:120px; font-family:monospace; background:#1a1a2e; color:#00ff88; font-size:.72rem; resize:vertical; }
 
 		.preview-box {
-			text-align: center;
-			padding: 10px;
-			background: #f8f9fa;
-			border: 1px dashed #ccc;
-			border-radius: 8px;
+			text-align:center; padding:10px; background:#f8f9fa;
+			border:1px dashed #ccc; border-radius:8px; min-height:60px;
+			display:flex; align-items:center; justify-content:center;
+		}
+		.preview-box img { max-width:100%; height:auto; }
+
+		.paper-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+
+		.progress-wrap { background:#eee; border-radius:4px; height:7px; margin-top:8px; display:none; }
+		.progress-bar  { background:var(--primary); height:7px; border-radius:4px; width:0%; transition:width .2s; }
+
+		.steps { padding:4px 0; }
+		.step-item {
+			display:flex; gap:10px; align-items:flex-start;
+			padding:7px 0; border-bottom:1px solid #f3f3f3; font-size:.82rem;
+		}
+		.step-item:last-child { border-bottom:none; }
+		.step-num {
+			min-width:22px; height:22px; border-radius:50%;
+			background:var(--primary); color:#fff; font-size:.73rem;
+			font-weight:700; display:flex; align-items:center;
+			justify-content:center; flex-shrink:0; margin-top:1px;
 		}
 
-		.preview-box img { max-width: 100%; height: auto; }
-
-		.paper-size-group {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 10px;
-			margin-bottom: 15px;
+		.uuid-result {
+			display:none; margin-top:10px; background:#f0fff4; border:1px solid #b7eac8;
+			border-radius:6px; padding:10px; font-size:.78rem; font-family:monospace; line-height:1.7;
 		}
-
-		.input-small {
-			padding: 8px;
-			border: 1px solid #ddd;
-			border-radius: 4px;
-			font-size: 0.85rem;
-			width: 100%;
-		}
-
-		/* UUID list UI */
-		.uuid-list {
-			display: flex;
-			flex-direction: column;
-			gap: 6px;
-			margin-top: 8px;
-		}
-
-		.uuid-item {
-			display: flex;
-			align-items: center;
-			gap: 8px;
-			padding: 6px 10px;
-			background: #f8f9fa;
-			border-radius: 6px;
-			font-size: 0.78rem;
-			cursor: pointer;
-			border: 1px solid #ddd;
-			transition: background 0.15s;
-		}
-
-		.uuid-item:hover { background: #e2e8f0; }
-		.uuid-item.active { border-color: var(--primary-color); background: #e7f3ff; }
-		.uuid-item .uuid-label { font-weight: 600; min-width: 110px; }
-		.uuid-item .uuid-val   { color: #555; font-family: monospace; font-size: 0.72rem; word-break: break-all; }
-
-		/* Progress bar */
-		.progress-wrap { background: #eee; border-radius: 4px; height: 8px; margin-top: 8px; display: none; }
-		.progress-bar  { background: var(--primary-color); height: 8px; border-radius: 4px; width: 0%; transition: width 0.2s; }
 
 		@media print {
-			@page { margin: 0; }
-			body { margin: 0; padding: 0; }
-			body * { visibility: hidden; }
-			.preview-box, .preview-box img { visibility: visible; }
+			@page { margin:0; }
+			body * { visibility:hidden; }
+			.preview-box, .preview-box img { visibility:visible; }
 			.preview-box {
-				position: absolute; left: 0; top: 0;
-				width: 100%; height: 100%;
-				display: flex; justify-content: center; align-items: center;
-				background: white !important; border: none !important; padding: 0 !important;
+				position:absolute; left:0; top:0; width:100%; height:100%;
+				display:flex; justify-content:center; align-items:center;
+				background:white !important; border:none !important; padding:0 !important;
 			}
-			.preview-box img { width: 100%; height: auto; display: block; }
+			.preview-box img { width:100%; height:auto; }
 		}
 	</style>
 </head>
 <body>
 <div class="container">
 
+	<!-- Header -->
 	<div class="header">
 		<div class="logo"><i class="fab fa-bluetooth-b"></i> MODA Bluetooth</div>
 		<div class="nav-buttons">
@@ -244,101 +156,137 @@
 		</div>
 	</div>
 
-	<!-- Android hint -->
-	<div class="info-box">
-		<strong>Android / Chrome:</strong> ต้องรันบน <b>HTTPS</b> เท่านั้น และเปิด Bluetooth ก่อน<br>
-		👉 แนะนำกด <b>"🔍 Scan ทุก Device"</b> — ระบบจะหา UUID ให้อัตโนมัติ ไม่ต้องเลือก Profile เอง
-	</div>
-
-	<!-- === SECTION: Connect === -->
+	<!-- Status -->
 	<div class="card">
-		<div class="section-title"><i class="fas fa-link"></i> เชื่อมต่อ</div>
-
-		<label>เครื่องพิมพ์ (BrowserPrint / PC):</label>
-		<select id="selected_device">
-			<option value="">-- ตรวจหาอัตโนมัติ --</option>
-		</select>
-
-		<div class="btn-grid" style="margin-top:10px;">
-			<button id="btnFindLocal"  class="btn btn-secondary"><i class="fas fa-search"></i> ค้นหา (PC)</button>
-			<button id="btnScanAll"    class="btn btn-primary"><i class="fab fa-bluetooth-b"></i> 🔍 Scan ทุก Device<br><small style="font-weight:400;font-size:0.72rem;">แนะนำ Android — Auto detect UUID</small></button>
-			<button id="btnBluetooth"  class="btn btn-secondary"><i class="fas fa-filter"></i> Connect (Filter UUID)<br><small style="font-weight:400;font-size:0.72rem;">ใช้ UUID ที่เลือกด้านล่าง</small></button>
-			<button id="btnDisconnect" class="btn btn-danger" style="display:none;"><i class="fas fa-times-circle"></i> ตัดการเชื่อมต่อ</button>
+		<div class="section-title"><i class="fas fa-circle-dot"></i> สถานะ</div>
+		<div class="status-row">
+			<div class="status-dot dot-red" id="statusDot"></div>
+			<span id="lblStatus" style="font-weight:600; font-size:.9rem;">ยังไม่ได้เชื่อมต่อ</span>
 		</div>
-	</div>
-
-	<!-- === SECTION: UUID Profile selector === -->
-	<div class="card">
-		<div class="section-title"><i class="fas fa-cogs"></i> UUID Profile (สำหรับ Connect Filter UUID)</div>
-
-		<div class="warn-box">
-			⚠️ ใช้เฉพาะกรณีกด <b>Connect (Filter UUID)</b> — หากใช้ <b>Scan ทุก Device</b> ระบบเลือก UUID อัตโนมัติ ไม่ต้องตั้งค่านี้
-		</div>
-
-		<div class="uuid-list" id="uuidList">
-			<div class="uuid-item active" data-svc="000018f0-0000-1000-8000-00805f9b34fb" data-char="00002af1-0000-1000-8000-00805f9b34fb">
-				<span class="uuid-label">✅ Zebra SPP (LE)</span>
-				<span class="uuid-val">Svc: 18f0 / Char: 2af1 — ใช้งานได้กับ ZQ310, ZQ320</span>
-			</div>
-			<div class="uuid-item" data-svc="00001101-0000-1000-8000-00805f9b34fb" data-char="">
-				<span class="uuid-label">🔵 Generic SPP (Classic BT)</span>
-				<span class="uuid-val">Svc: 1101 — Bluetooth Classic Serial Port Profile</span>
-			</div>
-			<div class="uuid-item" data-svc="38eb4a80-c570-11e3-9507-0002a5d5c51b" data-char="be39ffa2-c570-11e3-9507-0002a5d5c51b">
-				<span class="uuid-label">🦓 Zebra ZSDK (LE)</span>
-				<span class="uuid-val">Svc: 38eb4a80 / Char: be39ffa2 — Zebra Link-OS SDK</span>
-			</div>
-			<div class="uuid-item" data-svc="49535343-fe7d-4ae5-8fa9-9fafd205e455" data-char="49535343-1e4d-4bd9-ba61-23c647249616">
-				<span class="uuid-label">🔷 Nordic UART (NUS)</span>
-				<span class="uuid-val">Svc: 49535343 / Char: ...1616 — บาง Zebra รุ่นใหม่</span>
-			</div>
-			<div class="uuid-item" data-svc="custom" data-char="custom">
-				<span class="uuid-label">⚙️ Custom UUID</span>
-				<span class="uuid-val" id="customUuidDisplay">ระบุเอง</span>
-			</div>
-		</div>
-
-		<!-- Custom UUID inputs (hidden by default) -->
-		<div id="customUuidFields" style="display:none; margin-top:10px; display:none;">
-			<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
-				<div>
-					<label>Service UUID:</label>
-					<input type="text" id="customSvcUuid" class="input-small" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
-				</div>
-				<div>
-					<label>Characteristic UUID:</label>
-					<input type="text" id="customCharUuid" class="input-small" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- === SECTION: Paper Size === -->
-	<div class="card">
-		<div class="section-title"><i class="fas fa-ruler-combined"></i> ตั้งค่าหน้ากระดาษ</div>
-		<div class="paper-size-group">
-			<div>
-				<label>ความกว้าง (นิ้ว):</label>
-				<input type="number" id="txtPaperWidth"  class="input-small" value="4" step="0.1" />
-			</div>
-			<div>
-				<label>ความสูง (นิ้ว):</label>
-				<input type="number" id="txtPaperHeight" class="input-small" value="6" step="0.1" />
-			</div>
-		</div>
-		<div class="info-box" style="margin-bottom:0;">* ขนาดมาตรฐานทั่วไปคือ 4x6 นิ้ว</div>
-	</div>
-
-	<!-- === SECTION: Status === -->
-	<div class="card">
-		<div class="section-title"><i class="fas fa-info-circle"></i> สถานะ: <span id="lblStatus">Idle</span></div>
-		<span id="statusBadge" class="status-badge status-disconnected">DISCONNECTED</span>
 		<div class="progress-wrap" id="progressWrap">
 			<div class="progress-bar" id="progressBar"></div>
 		</div>
 	</div>
 
-	<!-- === SECTION: ZPL === -->
+	<!-- Root cause explanation -->
+	<div class="error-box">
+		<strong>⚠️ สาเหตุ GATT Error บน Android:</strong><br>
+		Zebra รุ่นเก่า (ZQ310, ZD220 ฯลฯ) ใช้ <b>Bluetooth Classic (SPP)</b> ซึ่ง Web Browser <b>ไม่รองรับ</b><br>
+		Web Bluetooth รองรับเฉพาะ <b>BLE เท่านั้น</b> — วิธีแก้ที่ได้ผล 100% คือใช้ <b>Zebra BrowserPrint App</b> หรือ <b>System Print</b>
+	</div>
+
+	<!-- Method Tabs -->
+	<div class="method-tabs">
+		<button class="method-tab active" id="tab-bp"  onclick="switchMethod('bp')"><i class="fas fa-desktop"></i> BrowserPrint<br><small style="font-weight:400">แนะนำ</small></button>
+		<button class="method-tab"        id="tab-ble" onclick="switchMethod('ble')"><i class="fab fa-bluetooth"></i> BLE<br><small style="font-weight:400">Zebra Plus</small></button>
+		<button class="method-tab"        id="tab-sys" onclick="switchMethod('sys')"><i class="fas fa-mobile-alt"></i> System Print<br><small style="font-weight:400">Universal</small></button>
+	</div>
+
+	<!-- ===== PANEL: BrowserPrint ===== -->
+	<div id="panel-bp">
+		<div class="card">
+			<div class="section-title"><i class="fas fa-desktop"></i> Zebra BrowserPrint</div>
+			<div class="ok-box">✅ ใช้งานได้กับ <b>ทุกรุ่น Zebra</b> ทั้ง Classic BT และ BLE — แนะนำ Android</div>
+			<div class="steps">
+				<div class="step-item"><div class="step-num">1</div><div>ดาวน์โหลด <b>"Zebra Browser Print"</b> จาก Play Store แล้วเปิด App</div></div>
+				<div class="step-item"><div class="step-num">2</div><div>ใน App ให้ Pair เครื่องพิมพ์ผ่าน Bluetooth</div></div>
+				<div class="step-item"><div class="step-num">3</div><div>กลับมาที่หน้านี้ แล้วกด <b>"ค้นหาเครื่องพิมพ์"</b> ด้านล่าง</div></div>
+				<div class="step-item"><div class="step-num">4</div><div>เลือกเครื่องพิมพ์ แล้วกด <b>"พิมพ์"</b></div></div>
+			</div>
+			<label style="margin-top:12px;">เครื่องพิมพ์:</label>
+			<select id="selected_device">
+				<option value="">-- กด "ค้นหา" ก่อน --</option>
+			</select>
+			<div class="btn-grid">
+				<button class="btn btn-primary"  onclick="findLocalPrinters()"><i class="fas fa-search"></i> ค้นหาเครื่องพิมพ์</button>
+				<button class="btn btn-success"  onclick="printZplBP()"><i class="fas fa-print"></i> พิมพ์</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- ===== PANEL: BLE ===== -->
+	<div id="panel-ble" style="display:none;">
+		<div class="card">
+			<div class="section-title"><i class="fab fa-bluetooth-b"></i> Web Bluetooth BLE</div>
+			<div class="warn-box">
+				⚠️ ใช้ได้เฉพาะ Zebra รุ่น <b>BLE</b> เช่น ZQ630 Plus, ZQ310 Plus (มีคำว่า "Plus")<br>
+				รุ่นอื่นจะเกิด GATT Error — ต้อง <b>Pair ใน Android Settings ก่อน</b> แล้วค่อยกด Connect
+			</div>
+
+			<!-- MAC Address -->
+			<div style="margin-bottom:14px;">
+				<label><i class="fas fa-barcode"></i> MAC Address เครื่องพิมพ์
+					<span style="font-weight:400; color:#888;">(ไม่บังคับ — ใช้เก็บไว้อ้างอิง)</span>
+				</label>
+				<div class="input-row">
+					<input type="text" id="txtMac" placeholder="AC:3F:A4:11:22:33"
+						maxlength="17" oninput="formatMac(this)"
+						style="font-family:monospace; letter-spacing:1px; text-transform:uppercase;" />
+					<button class="btn btn-outline" onclick="saveMac()" style="white-space:nowrap;">
+						<i class="fas fa-save"></i> บันทึก
+					</button>
+				</div>
+				<div style="font-size:.75rem; color:#888; margin-top:5px;">
+					📍 ดู MAC ได้จาก: Android Settings → Bluetooth → กดค้างที่ชื่อเครื่องพิมพ์ → รายละเอียด
+				</div>
+			</div>
+
+			<!-- Scan mode -->
+			<label>โหมดการค้นหา:</label>
+			<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
+				<label style="font-weight:400; display:flex; gap:8px; padding:9px; border:1.5px solid #ddd; border-radius:7px; cursor:pointer; align-items:center;">
+					<input type="radio" name="scanMode" value="all" checked /> แสดงทุก Device
+				</label>
+				<label style="font-weight:400; display:flex; gap:8px; padding:9px; border:1.5px solid #ddd; border-radius:7px; cursor:pointer; align-items:center;">
+					<input type="radio" name="scanMode" value="zebra" /> เฉพาะ Zebra
+				</label>
+			</div>
+
+			<div class="btn-grid">
+				<button class="btn btn-primary btn-full" id="btnConnectBLE" onclick="connectBLE()">
+					<i class="fab fa-bluetooth-b"></i> เชื่อมต่อ BLE
+				</button>
+				<button class="btn btn-danger" id="btnDisBLE" onclick="disconnectBLE()" style="display:none;">
+					<i class="fas fa-times-circle"></i> ตัดการเชื่อมต่อ
+				</button>
+			</div>
+
+			<div class="uuid-result" id="uuidResult"></div>
+
+			<button class="btn btn-success btn-full" onclick="printZplBLE()" style="margin-top:10px;">
+				<i class="fas fa-print"></i> พิมพ์ ZPL ผ่าน BLE
+			</button>
+		</div>
+	</div>
+
+	<!-- ===== PANEL: System Print ===== -->
+	<div id="panel-sys" style="display:none;">
+		<div class="card">
+			<div class="section-title"><i class="fas fa-mobile-alt"></i> System Print</div>
+			<div class="ok-box">✅ ใช้ได้กับ <b>ทุก Android ทุกเครื่องพิมพ์</b> — Android จัดการ Bluetooth เอง</div>
+			<div class="steps">
+				<div class="step-item"><div class="step-num">1</div><div>Pair เครื่องพิมพ์ใน <b>Android Settings → Bluetooth</b> ก่อน</div></div>
+				<div class="step-item"><div class="step-num">2</div><div>กด <b>Preview</b> เพื่อสร้างภาพ Label</div></div>
+				<div class="step-item"><div class="step-num">3</div><div>กด <b>System Print</b> → เลือกเครื่องพิมพ์ Zebra จาก Android print dialog</div></div>
+			</div>
+			<div class="btn-grid" style="margin-top:12px;">
+				<button class="btn btn-secondary" onclick="updatePreview()"><i class="fas fa-eye"></i> Preview</button>
+				<button class="btn btn-warning"   onclick="systemPrint()"><i class="fas fa-print"></i> System Print</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Paper Size -->
+	<div class="card">
+		<div class="section-title"><i class="fas fa-ruler-combined"></i> ตั้งค่าหน้ากระดาษ</div>
+		<div class="paper-row">
+			<div><label>ความกว้าง (นิ้ว):</label><input type="number" id="txtW" value="4" step="0.1" min="1" max="12" /></div>
+			<div><label>ความสูง (นิ้ว):</label><input type="number"  id="txtH" value="6" step="0.1" min="1" max="24" /></div>
+		</div>
+		<div class="info-box" style="margin-bottom:0;">* ขนาดมาตรฐานทั่วไปคือ 4×6 นิ้ว</div>
+	</div>
+
+	<!-- ZPL -->
 	<div class="card">
 		<div class="section-title"><i class="fas fa-code"></i> ZPL Code</div>
 		<textarea id="txtZpl" class="zpl-editor">^XA
@@ -351,543 +299,348 @@
 ^PQ1,1,1,Y
 ^XZ</textarea>
 		<div class="btn-grid">
-			<button id="btnPreview"     class="btn btn-secondary"><i class="fas fa-eye"></i> Preview</button>
-			<button id="btnPrint"       class="btn btn-success"><i class="fas fa-print"></i> พิมพ์ ZPL</button>
-			<button id="btnSystemPrint" class="btn btn-warning"><i class="fas fa-mobile-alt"></i> System Print</button>
+			<button class="btn btn-secondary" onclick="updatePreview()"><i class="fas fa-eye"></i> Preview</button>
+			<button class="btn btn-success"   onclick="printAuto()"><i class="fas fa-print"></i> พิมพ์</button>
 		</div>
 	</div>
 
-	<!-- === SECTION: Preview === -->
+	<!-- Preview -->
 	<div class="card">
 		<div class="section-title"><i class="fas fa-image"></i> Label Preview</div>
-		<div class="preview-box">
-			<img id="labelPreview" src="" alt="Preview" />
-		</div>
+		<div class="preview-box"><img id="labelPreview" src="" alt="กด Preview เพื่อดูตัวอย่าง" /></div>
 	</div>
 
-	<!-- === SECTION: Log === -->
+	<!-- Log -->
 	<div class="card">
 		<div class="section-title">
 			<i class="fas fa-terminal"></i> Log
-			<button onclick="document.getElementById('log').value=''" style="margin-left:auto; padding:3px 8px; font-size:0.7rem; border:1px solid #ccc; border-radius:4px; cursor:pointer; background:#f8f9fa;">Clear</button>
+			<button onclick="document.getElementById('log').value=''"
+				style="margin-left:auto;padding:3px 8px;font-size:.7rem;border:1px solid #ccc;border-radius:4px;cursor:pointer;background:#f8f9fa;">
+				Clear
+			</button>
 		</div>
 		<textarea id="log" class="log-editor" readonly></textarea>
 	</div>
 
 </div><!-- /container -->
-
 <script>
-/* =====================================================================
-   MODA Bluetooth Print — Android-compatible Web Bluetooth
-   ===================================================================== */
+/* ============================================================
+   MODA BT Print v3 — Android + BLE + BrowserPrint + System
+   ============================================================ */
+var btDevice = null, btChar = null, btServer = null;
+var logEl, currentMethod = 'bp', isConnecting = false;
 
-var selected_device = null;   // BrowserPrint device
-var btDevice   = null;        // Web Bluetooth BluetoothDevice
-var btServer   = null;        // GATTServer
-var btChar     = null;        // WritableCharacteristic
-var logEl      = null;
-var isConnecting = false;
-
-/* --- Logging -------------------------------------------------------- */
-function log(msg, type) {
-	const ts = new Date().toLocaleTimeString('th-TH');
-	const prefix = type === 'error' ? '❌' : type === 'ok' ? '✅' : type === 'warn' ? '⚠️' : '▶';
-	if (logEl) {
-		logEl.value += `[${ts}] ${prefix} ${msg}\n`;
-		logEl.scrollTop = logEl.scrollHeight;
-	}
-	console.log(msg);
-}
-
-/* --- Status --------------------------------------------------------- */
-function updateStatus(msg, state) {
-	// state: 'connected' | 'disconnected' | 'connecting'
-	document.getElementById('lblStatus').textContent = msg;
-	const badge = document.getElementById('statusBadge');
-	const labels = { connected: 'CONNECTED', disconnected: 'DISCONNECTED', connecting: 'CONNECTING...' };
-	badge.textContent = labels[state] || state;
-	badge.className   = 'status-badge status-' + state;
-	document.getElementById('btnDisconnect').style.display = (state === 'connected') ? '' : 'none';
-}
-
-/* --- Progress ------------------------------------------------------- */
-function showProgress(pct) {
-	const wrap = document.getElementById('progressWrap');
-	const bar  = document.getElementById('progressBar');
-	wrap.style.display = pct >= 100 || pct < 0 ? 'none' : 'block';
-	bar.style.width = Math.max(0, Math.min(100, pct)) + '%';
-}
-
-/* ===================================================================
-   UUID / Profile Selection
-   =================================================================== */
-var activeUUID = {
-	svc:  '000018f0-0000-1000-8000-00805f9b34fb',
-	char: '00002af1-0000-1000-8000-00805f9b34fb'
-};
-
-function initUUIDList() {
-	document.querySelectorAll('.uuid-item').forEach(item => {
-		item.addEventListener('click', function() {
-			document.querySelectorAll('.uuid-item').forEach(i => i.classList.remove('active'));
-			this.classList.add('active');
-
-			const svc  = this.dataset.svc;
-			const char = this.dataset.char;
-			const customFields = document.getElementById('customUuidFields');
-
-			if (svc === 'custom') {
-				customFields.style.display = 'block';
-			} else {
-				customFields.style.display = 'none';
-				activeUUID.svc  = svc;
-				activeUUID.char = char;
-				log(`เลือก Profile: Svc=${svc}`, 'ok');
-			}
-		});
-	});
-
-	// Custom UUID apply on input change
-	['customSvcUuid','customCharUuid'].forEach(id => {
-		document.getElementById(id).addEventListener('input', () => {
-			activeUUID.svc  = document.getElementById('customSvcUuid').value.trim();
-			activeUUID.char = document.getElementById('customCharUuid').value.trim();
-			document.getElementById('customUuidDisplay').textContent =
-				`Svc: ${activeUUID.svc || '-'} / Char: ${activeUUID.char || '-'}`;
-		});
-	});
-}
-
-/* ===================================================================
-   Web Bluetooth — Connect
-   =================================================================== */
-
-// Known Zebra service UUIDs to probe (in priority order)
-const ZEBRA_SERVICE_UUIDS = [
-	{ label: 'Zebra SPP LE',   svc: '000018f0-0000-1000-8000-00805f9b34fb', char: '00002af1-0000-1000-8000-00805f9b34fb' },
-	{ label: 'Zebra ZSDK',     svc: '38eb4a80-c570-11e3-9507-0002a5d5c51b', char: 'be39ffa2-c570-11e3-9507-0002a5d5c51b' },
-	{ label: 'Nordic UART',    svc: '49535343-fe7d-4ae5-8fa9-9fafd205e455', char: '49535343-1e4d-4bd9-ba61-23c647249616' },
-	{ label: 'Generic FFE0',   svc: '0000ffe0-0000-1000-8000-00805f9b34fb', char: '0000ffe1-0000-1000-8000-00805f9b34fb' },
-	{ label: 'Generic SPP',    svc: '00001101-0000-1000-8000-00805f9b34fb', char: '' },
+const BLE_PROFILES = [
+	{ label:'Zebra SPP-LE', svc:'000018f0-0000-1000-8000-00805f9b34fb', char:'00002af1-0000-1000-8000-00805f9b34fb' },
+	{ label:'Zebra ZSDK',   svc:'38eb4a80-c570-11e3-9507-0002a5d5c51b', char:'be39ffa2-c570-11e3-9507-0002a5d5c51b' },
+	{ label:'Nordic UART',  svc:'49535343-fe7d-4ae5-8fa9-9fafd205e455', char:'49535343-1e4d-4bd9-ba61-23c647249616' },
+	{ label:'Generic FFE0', svc:'0000ffe0-0000-1000-8000-00805f9b34fb', char:'0000ffe1-0000-1000-8000-00805f9b34fb' },
 ];
+const ALL_SVCS = BLE_PROFILES.map(p => p.svc);
 
-function checkBtPrerequisites() {
+/* -- Log -- */
+function log(msg, type) {
+	const icon = {ok:'✅',error:'❌',warn:'⚠️',info:'ℹ️'}[type] || '▶';
+	const ts   = new Date().toLocaleTimeString('th-TH');
+	if (logEl) { logEl.value += `[${ts}] ${icon} ${msg}\n`; logEl.scrollTop = logEl.scrollHeight; }
+}
+
+/* -- Status -- */
+function setStatus(msg, state) {
+	document.getElementById('lblStatus').textContent = msg;
+	const cls = {ok:'dot-green', connecting:'dot-yellow', error:'dot-red', idle:'dot-red'};
+	document.getElementById('statusDot').className = 'status-dot ' + (cls[state] || 'dot-red');
+}
+
+/* -- Progress -- */
+function showProgress(pct) {
+	document.getElementById('progressWrap').style.display = (pct < 0 || pct >= 100) ? 'none' : 'block';
+	document.getElementById('progressBar').style.width = Math.max(0, Math.min(100, pct)) + '%';
+}
+
+/* -- Tabs -- */
+function switchMethod(m) {
+	currentMethod = m;
+	['bp','ble','sys'].forEach(id => {
+		document.getElementById('tab-'  + id).classList.toggle('active', id === m);
+		document.getElementById('panel-'+ id).style.display = (id === m) ? '' : 'none';
+	});
+}
+
+/* -- MAC formatter -- */
+function formatMac(el) {
+	let v = el.value.replace(/[^0-9a-fA-F]/g,'').toUpperCase().slice(0,12);
+	let o = '';
+	for (let i = 0; i < v.length; i++) { if (i && i%2===0) o+=':'; o+=v[i]; }
+	el.value = o;
+}
+function saveMac() {
+	const mac = document.getElementById('txtMac').value;
+	if (mac.length === 17) {
+		try { localStorage.setItem('moda_mac', mac); } catch(e){}
+		log('บันทึก MAC: ' + mac, 'ok');
+		alert('บันทึกแล้ว: ' + mac);
+	} else { alert('MAC ไม่ถูกต้อง — ต้องการรูปแบบ XX:XX:XX:XX:XX:XX'); }
+}
+
+/* ============================================================
+   BrowserPrint
+   ============================================================ */
+function setupBrowserPrint() {
+	if (typeof BrowserPrint === 'undefined') { log('BrowserPrint.js ไม่โหลด', 'warn'); return; }
+	BrowserPrint.getDefaultDevice('printer', function(d) {
+		log('BrowserPrint พบ: ' + d.name, 'ok');
+		setStatus('BrowserPrint: ' + d.name, 'ok');
+		addDevOpt(d);
+	}, () => log('ไม่พบ BrowserPrint service'));
+}
+
+function findLocalPrinters() {
+	if (typeof BrowserPrint === 'undefined') {
+		alert('ไม่พบ BrowserPrint.js\nกรุณาติดตั้ง Zebra Browser Print App ก่อน');
+		return;
+	}
+	log('ค้นหา BrowserPrint...');
+	BrowserPrint.getLocalDevices(function(list) {
+		const sel = document.getElementById('selected_device');
+		sel.innerHTML = '<option value="">-- เลือกเครื่องพิมพ์ --</option>';
+		list.forEach(addDevOpt);
+		log('พบ ' + list.length + ' เครื่อง', list.length ? 'ok' : 'warn');
+		if (list.length) setStatus('พบ ' + list.length + ' เครื่องพิมพ์', 'ok');
+	}, e => log('Error: '+e, 'error'), 'printer');
+}
+
+function addDevOpt(d) {
+	const o = document.createElement('option');
+	o.text  = d.name + (d.connection === 'bluetooth' ? ' (BT)' : ' (USB/Net)');
+	o.value = d.uid;
+	document.getElementById('selected_device').add(o);
+}
+
+function printZplBP() {
+	const uid = document.getElementById('selected_device').value;
+	const zpl = document.getElementById('txtZpl').value.trim();
+	if (!uid) { alert('เลือกเครื่องพิมพ์ก่อน'); return; }
+	if (!zpl) { alert('กรุณาใส่ ZPL'); return; }
+	if (typeof BrowserPrint === 'undefined') { alert('ไม่พบ BrowserPrint.js'); return; }
+
+	BrowserPrint.getLocalDevices(function(list) {
+		const d = list.find(x => x.uid === uid);
+		if (!d) { alert('ไม่พบเครื่องพิมพ์ที่เลือก'); return; }
+		log('พิมพ์ผ่าน ' + d.name + '...');
+		d.send(zpl,
+			()  => { log('พิมพ์สำเร็จ ✓', 'ok'); setStatus('พิมพ์สำเร็จ', 'ok'); },
+			err => { log('Error: ' + err, 'error'); alert('พิมพ์ไม่สำเร็จ:\n' + err); }
+		);
+	}, e => log('Error: '+e,'error'), 'printer');
+}
+
+/* ============================================================
+   BLE (Web Bluetooth)
+   ============================================================ */
+async function connectBLE() {
+	if (isConnecting) return;
 	if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-		log('ต้องการ HTTPS — Web Bluetooth ไม่ทำงานบน HTTP', 'warn');
-		alert('⚠️ Web Bluetooth ต้องการ HTTPS\nกรุณาเปิดหน้านี้ผ่าน HTTPS หรือ localhost');
-		return false;
+		alert('⚠️ Web Bluetooth ต้องใช้ HTTPS\nกรุณาเปิดผ่าน https://');
+		return;
 	}
 	if (!navigator.bluetooth) {
-		log('Browser ไม่รองรับ Web Bluetooth', 'error');
-		alert('Browser ไม่รองรับ Web Bluetooth\nกรุณาใช้ Chrome บน Android (ไม่ใช่ WebView)');
-		return false;
+		alert('Browser ไม่รองรับ Web Bluetooth\nใช้ Chrome บน Android (ไม่ใช่ Samsung Internet)');
+		return;
 	}
-	return true;
-}
 
-// โหมด 1: Scan ทุก device (แก้ปัญหาหาไม่เจอ)
-async function connectBluetoothScanAll() {
-	if (isConnecting) return;
-	if (!checkBtPrerequisites()) return;
 	isConnecting = true;
+	setStatus('กำลังค้นหา...', 'connecting');
+	document.getElementById('btnConnectBLE').disabled = true;
 
 	try {
-		updateStatus('กำลังค้นหา (ทุก Device)...', 'connecting');
-		log('📡 Scan ALL devices — เลือกเครื่องพิมพ์จาก popup ได้เลย');
+		const mode = document.querySelector('input[name="scanMode"]:checked').value;
+		const opts = mode === 'all'
+			? { acceptAllDevices: true, optionalServices: ALL_SVCS }
+			: {
+				filters: [
+					...ALL_SVCS.map(s=>({services:[s]})),
+					{namePrefix:'Zebra'},{namePrefix:'ZQ'},{namePrefix:'ZD'},
+					{namePrefix:'ZT'},{namePrefix:'GK'},{namePrefix:'GX'},
+				],
+				optionalServices: ALL_SVCS
+			};
 
-		btDevice = await navigator.bluetooth.requestDevice({
-			acceptAllDevices: true,
-			optionalServices: ZEBRA_SERVICE_UUIDS.map(u => u.svc).filter(Boolean)
-		});
+		log('เปิด Bluetooth picker...', 'info');
+		btDevice = await navigator.bluetooth.requestDevice(opts);
+		log('เลือก: "' + (btDevice.name||'(ไม่มีชื่อ)') + '"', 'ok');
+		setStatus('กำลัง detect UUID...', 'connecting');
 
-		log(`✅ เลือก Device: "${btDevice.name || '(ไม่มีชื่อ)'}"`, 'ok');
-		updateStatus(`กำลัง detect UUID: ${btDevice.name || 'device'}...`, 'connecting');
+		await doGATT();
+		btDevice.addEventListener('gattserverdisconnected', onBLEDis);
+		document.getElementById('btnDisBLE').style.display = '';
 
-		// Auto-detect UUID
-		await autoDetectAndConnect();
-
-		btDevice.addEventListener('gattserverdisconnected', onDisconnected);
-
-	} catch (err) {
-		handleBtError(err);
-	} finally {
-		isConnecting = false;
-	}
-}
-
-// โหมด 2: Connect ด้วย UUID ที่เลือกจาก profile list
-async function connectBluetooth() {
-	if (isConnecting) return;
-	if (!checkBtPrerequisites()) return;
-	isConnecting = true;
-
-	try {
-		updateStatus('กำลังค้นหา...', 'connecting');
-		const svcUUID  = activeUUID.svc;
-		const charUUID = activeUUID.char;
-		log(`🔍 Filter by UUID: ${svcUUID}`);
-
-		btDevice = await navigator.bluetooth.requestDevice({
-			filters: [
-				{ services: [svcUUID] },
-				{ namePrefix: 'Zebra' }, { namePrefix: 'ZQ' },
-				{ namePrefix: 'ZD'   }, { namePrefix: 'ZT' },
-				{ namePrefix: 'GK'   }, { namePrefix: 'GX' },
-				{ namePrefix: 'MODA' },
-			],
-			optionalServices: ZEBRA_SERVICE_UUIDS.map(u => u.svc).filter(Boolean)
-		});
-
-		log(`พบ Device: ${btDevice.name || '(ไม่มีชื่อ)'}`, 'ok');
-		updateStatus(`เชื่อมต่อ ${btDevice.name || 'device'}...`, 'connecting');
-
-		await doGattConnect(svcUUID, charUUID);
-		btDevice.addEventListener('gattserverdisconnected', onDisconnected);
-
-	} catch (err) {
-		handleBtError(err);
-	} finally {
-		isConnecting = false;
-	}
-}
-
-// Auto-detect UUID: ลองทีละ service จนสำเร็จ
-async function autoDetectAndConnect() {
-	log('🔎 Auto-detect UUID — กำลังทดสอบทีละ profile...');
-
-	// Connect GATT once
-	let server = null;
-	for (let attempt = 1; attempt <= 3; attempt++) {
-		try {
-			server = await btDevice.gatt.connect();
-			break;
-		} catch(e) {
-			log(`GATT attempt ${attempt}: ${e.message}`, 'warn');
-			if (attempt === 3) throw e;
-			await sleep(700 * attempt);
-		}
-	}
-	btServer = server;
-	log('GATT Connected ✓', 'ok');
-
-	// Get all services
-	let services = [];
-	try {
-		services = await server.getPrimaryServices();
-		log(`พบ ${services.length} service(s): ${services.map(s=>s.uuid).join(', ')}`);
 	} catch(e) {
-		log('ดึง services ไม่ได้: ' + e.message + ' — ลอง probe ทีละตัว', 'warn');
+		const m = e.message || '';
+		if (m.includes('cancel') || m.includes('User cancel') || m.includes('chooser')) {
+			log('ผู้ใช้ยกเลิก', 'warn'); setStatus('ยกเลิก', 'idle');
+		} else {
+			log('BLE Error: ' + m, 'error'); setStatus('เชื่อมต่อไม่สำเร็จ', 'error');
+			alert('เชื่อมต่อไม่สำเร็จ:\n\n' + m + '\n\n💡 ลองใช้แถบ BrowserPrint แทน');
+		}
+	} finally {
+		isConnecting = false;
+		document.getElementById('btnConnectBLE').disabled = false;
+	}
+}
+
+async function doGATT() {
+	log('เชื่อมต่อ GATT...', 'info');
+	for (let i = 1; i <= 3; i++) {
+		try   { btServer = await btDevice.gatt.connect(); log('GATT OK (try '+i+')', 'ok'); break; }
+		catch (e) {
+			log('GATT try '+i+': '+e.message, 'warn');
+			if (i===3) throw new Error(
+				'GATT เชื่อมต่อล้มเหลว 3 ครั้ง\n\n' +
+				'สาเหตุที่พบบ่อย:\n' +
+				'1. เครื่องพิมพ์ใช้ Bluetooth Classic (ไม่ใช่ BLE)\n' +
+				'2. ยังไม่ได้ Pair ใน Android Settings\n\n' +
+				'💡 ให้ใช้แถบ "BrowserPrint" แทน'
+			);
+			await sleep(700*i);
+		}
 	}
 
-	// Try each known UUID
-	for (const profile of ZEBRA_SERVICE_UUIDS) {
+	log('ค้นหา Service UUID...', 'info');
+	let found = null;
+	for (const p of BLE_PROFILES) {
 		try {
-			log(`⏳ ทดสอบ [${profile.label}] svc=${profile.svc}`);
-			const svc   = await server.getPrimaryService(profile.svc);
+			const svc   = await btServer.getPrimaryService(p.svc);
 			const chars = await svc.getCharacteristics();
-			log(`   พบ ${chars.length} characteristic(s): ${chars.map(c=>c.uuid).join(', ')}`);
-
-			// Find writable char: prefer known UUID, fallback to first writable
-			let char = profile.char ? chars.find(c => c.uuid === profile.char) : null;
-			if (!char) char = chars.find(c => c.properties.write || c.properties.writeWithoutResponse);
-			if (!char) { log(`   ไม่พบ writable char`, 'warn'); continue; }
-
-			btChar = char;
-			activeUUID.svc  = profile.svc;
-			activeUUID.char = char.uuid;
-
-			// Update UI to reflect detected profile
-			document.querySelectorAll('.uuid-item').forEach(el => {
-				el.classList.toggle('active', el.dataset.svc === profile.svc);
-			});
-
-			updateStatus(`✅ เชื่อมต่อแล้ว: ${btDevice.name || 'Bluetooth'} [${profile.label}]`, 'connected');
-			log(`🎉 สำเร็จ! ใช้ Profile: ${profile.label} | Char: ${char.uuid}`, 'ok');
-			return;
-
-		} catch(e) {
-			log(`   ❌ [${profile.label}] ไม่รองรับ: ${e.message}`, 'warn');
-		}
-	}
-
-	throw new Error('ไม่พบ UUID ที่รองรับ — เครื่องพิมพ์นี้อาจไม่ใช่ Zebra หรือปิด BLE อยู่');
-}
-
-async function doGattConnect(svcUUID, charUUID) {
-	log('กำลังเชื่อมต่อ GATT Server...');
-
-	// Retry GATT connect up to 3 times (Android often drops first attempt)
-	let server = null;
-	for (let attempt = 1; attempt <= 3; attempt++) {
-		try {
-			server = await btDevice.gatt.connect();
+			let   ch    = chars.find(c=>c.uuid===p.char) || chars.find(c=>c.properties.write||c.properties.writeWithoutResponse);
+			if (!ch) continue;
+			btChar = ch;
+			found  = { ...p, char: ch.uuid };
 			break;
-		} catch(e) {
-			log(`GATT attempt ${attempt} failed: ${e.message}`, 'warn');
-			if (attempt === 3) throw e;
-			await sleep(600 * attempt);
-		}
+		} catch(e) { /* not found, try next */ }
 	}
 
-	btServer = server;
-	log('GATT Connected ✓', 'ok');
-
-	log(`กำลังดึง Primary Service: ${svcUUID}`);
-	const service = await server.getPrimaryService(svcUUID);
-
-	if (!charUUID) {
-		// No char UUID — list available characteristics for debugging
-		const chars = await service.getCharacteristics();
-		log(`พบ Characteristics: ${chars.map(c=>c.uuid).join(', ')}`);
-		// Pick first writable characteristic
-		btChar = chars.find(c => c.properties.write || c.properties.writeWithoutResponse);
-		if (!btChar) throw new Error('ไม่พบ writable characteristic');
-		log(`ใช้ Char: ${btChar.uuid}`, 'ok');
-	} else {
-		btChar = await service.getCharacteristic(charUUID);
-		log(`Characteristic: ${btChar.uuid} ✓`, 'ok');
+	if (!found) {
+		// Try to list services for debug info
+		let svcList = '(ไม่สามารถดึงได้)';
+		try { const s = await btServer.getPrimaryServices(); svcList = s.map(x=>x.uuid).join('\n'); } catch(e){}
+		throw new Error(
+			'ไม่พบ Service UUID ที่รองรับ\n\n' +
+			'Services ที่พบ:\n' + svcList + '\n\n' +
+			'อุปกรณ์นี้อาจเป็น Bluetooth Classic — ใช้ BrowserPrint App แทน'
+		);
 	}
 
-	updateStatus(`เชื่อมต่อแล้ว: ${btDevice.name || 'Bluetooth'}`, 'connected');
-	log(`พร้อมพิมพ์ผ่าน Bluetooth ✓`, 'ok');
+	// Show detected UUID
+	const info = document.getElementById('uuidResult');
+	info.style.display = 'block';
+	info.innerHTML = `<b>✅ เชื่อมต่อสำเร็จ</b><br>Profile: <b>${found.label}</b><br>Service: ${found.svc}<br>Char: ${found.char}`;
+
+	setStatus('BLE: ' + (btDevice.name||'Connected') + ' ['+found.label+']', 'ok');
+	log('พร้อมพิมพ์ — ' + found.label, 'ok');
 }
 
-function onDisconnected() {
-	log('Bluetooth ตัดการเชื่อมต่อ — กำลัง reconnect...', 'warn');
-	updateStatus('Disconnected', 'disconnected');
+function onBLEDis() {
+	log('BLE หลุด — reconnect...', 'warn');
+	setStatus('Disconnected — reconnecting...', 'connecting');
 	btChar = null;
-
-	// Auto-reconnect after 1.5s
 	setTimeout(async () => {
 		if (btDevice && !btDevice.gatt.connected) {
-			try {
-				await doGattConnect(activeUUID.svc, activeUUID.char);
-				log('Reconnect สำเร็จ', 'ok');
-			} catch(e) {
-				log('Reconnect ล้มเหลว: ' + e.message, 'error');
-				updateStatus('Disconnected', 'disconnected');
-			}
+			try   { await doGATT(); log('Reconnect สำเร็จ', 'ok'); }
+			catch (e) { setStatus('Disconnected', 'error'); log('Reconnect ล้มเหลว: '+e.message, 'error'); document.getElementById('btnDisBLE').style.display='none'; }
 		}
 	}, 1500);
 }
 
-function disconnectBluetooth() {
-	if (btDevice && btDevice.gatt.connected) {
-		btDevice.removeEventListener('gattserverdisconnected', onDisconnected);
-		btDevice.gatt.disconnect();
-		log('ตัดการเชื่อมต่อ Bluetooth แล้ว');
-	}
-	btChar   = null;
-	btDevice = null;
-	btServer = null;
-	updateStatus('Disconnected', 'disconnected');
+function disconnectBLE() {
+	if (btDevice) { btDevice.removeEventListener('gattserverdisconnected', onBLEDis); if (btDevice.gatt.connected) btDevice.gatt.disconnect(); }
+	btDevice = btChar = btServer = null;
+	document.getElementById('btnDisBLE').style.display = 'none';
+	document.getElementById('uuidResult').style.display = 'none';
+	setStatus('ตัดการเชื่อมต่อแล้ว', 'idle');
+	log('Disconnect BLE', 'info');
 }
 
-function handleBtError(err) {
-	const msg = err.message || String(err);
-	log('Bluetooth Error: ' + msg, 'error');
-	updateStatus('เกิดข้อผิดพลาด', 'disconnected');
+async function printZplBLE() {
+	if (!btChar) { alert('ยังไม่ได้เชื่อมต่อ BLE\nกรุณากด "เชื่อมต่อ BLE" ก่อน'); return; }
+	const zpl  = document.getElementById('txtZpl').value.trim();
+	if (!zpl)  { alert('กรุณาใส่ ZPL'); return; }
 
-	if (msg.includes('User cancelled') || msg.includes('chooser')) {
-		log('ผู้ใช้ยกเลิกการเชื่อมต่อ', 'warn');
-	} else if (msg.includes('GATT')) {
-		alert(`GATT Error: ${msg}\n\nลองเปลี่ยน UUID Profile หรือ restart Bluetooth แล้วลองใหม่`);
-	} else if (msg.includes('no device')) {
-		alert('ไม่พบ device ที่ตรงกับ UUID ที่เลือก\nลองเปลี่ยน Profile แล้วลองใหม่');
-	} else {
-		alert(`เชื่อมต่อไม่สำเร็จ:\n${msg}`);
-	}
-}
-
-/* ===================================================================
-   BrowserPrint (PC / Zebra App)
-   =================================================================== */
-function setupBrowserPrint() {
-	log('กำลังตรวจหา BrowserPrint...');
-	if (typeof BrowserPrint === 'undefined') { log('BrowserPrint.js ไม่ได้โหลด', 'warn'); return; }
-
-	BrowserPrint.getDefaultDevice('printer', function(device) {
-		selected_device = device;
-		log(`BrowserPrint: ${device.name}`, 'ok');
-		updateStatus(`BrowserPrint: ${device.name}`, 'connected');
-		updatePrinterDropdown(device);
-	}, function() {
-		log('ไม่พบ BrowserPrint service');
-	});
-}
-
-function findLocalPrinters() {
-	log('ค้นหาเครื่องพิมพ์ในระบบ...');
-	if (typeof BrowserPrint === 'undefined') { log('BrowserPrint.js ไม่ได้โหลด', 'warn'); return; }
-
-	BrowserPrint.getLocalDevices(function(device_list) {
-		const sel = document.getElementById('selected_device');
-		sel.innerHTML = '<option value="">-- เลือกเครื่องพิมพ์ --</option>';
-		if (device_list.length > 0) {
-			device_list.forEach(updatePrinterDropdown);
-			log(`พบ ${device_list.length} เครื่อง`, 'ok');
-		} else {
-			log('ไม่พบเครื่องพิมพ์');
-		}
-	}, err => log('Error: ' + err, 'error'), 'printer');
-}
-
-function updatePrinterDropdown(device) {
-	const sel = document.getElementById('selected_device');
-	const opt = document.createElement('option');
-	opt.text  = device.name + (device.connection === 'bluetooth' ? ' (BT)' : ' (USB/Net)');
-	opt.value = device.uid;
-	sel.add(opt);
-}
-
-/* ===================================================================
-   Print ZPL
-   =================================================================== */
-async function printZpl() {
-	const zpl = document.getElementById('txtZpl').value.trim();
-	if (!zpl) return alert('กรุณาใส่ ZPL');
-
-	// 1. BrowserPrint dropdown
-	const selUid = document.getElementById('selected_device').value;
-	if (selUid && typeof BrowserPrint !== 'undefined') {
-		BrowserPrint.getLocalDevices(function(list) {
-			const dev = list.find(d => d.uid === selUid);
-			if (dev) {
-				log(`พิมพ์ผ่าน ${dev.name}...`);
-				dev.send(zpl, () => log('พิมพ์สำเร็จ ✓', 'ok'), e => log('Error: ' + e, 'error'));
-			}
-		}, e => log('Error: ' + e, 'error'), 'printer');
-		return;
-	}
-
-	// 2. Web Bluetooth
-	if (btChar) {
-		log('กำลังส่ง ZPL ผ่าน Bluetooth...');
-		try {
-			await sendZplBluetooth(zpl);
-			log('พิมพ์สำเร็จ ✓', 'ok');
-		} catch(e) {
-			log('Print Error: ' + e.message, 'error');
-			alert('พิมพ์ไม่สำเร็จ: ' + e.message);
-		}
-		return;
-	}
-
-	alert('กรุณาเชื่อมต่อเครื่องพิมพ์ก่อน\n(กด Connect Bluetooth หรือเลือกเครื่องพิมพ์จากรายการ)');
-}
-
-async function sendZplBluetooth(zpl) {
-	const encoder = new TextEncoder();
-	const data    = encoder.encode(zpl);
-
-	// Determine optimal MTU chunk size
-	// Android BLE default MTU = 23 bytes (payload 20), but after MTU exchange can be up to 512
-	// We try 512 first; if writeValue throws on large chunk, fall back to 128 then 20
-	const chunkSizes = [512, 128, 20];
-	let   chunkSize  = 512;
-
+	const data   = new TextEncoder().encode(zpl);
+	const noResp = btChar.properties.writeWithoutResponse;
 	showProgress(0);
 
-	// Try to use writeValueWithoutResponse when available (faster, no ACK wait)
-	const useWithoutResponse = btChar.properties.writeWithoutResponse;
-
-	for (let ci = 0; ci < chunkSizes.length; ci++) {
-		chunkSize = chunkSizes[ci];
+	for (const chunkSize of [512, 128, 20]) {
 		try {
 			for (let i = 0; i < data.length; i += chunkSize) {
-				const chunk = data.slice(i, i + chunkSize);
-				if (useWithoutResponse) {
-					await btChar.writeValueWithoutResponse(chunk);
-				} else {
-					await btChar.writeValue(chunk);
-				}
-				showProgress(Math.round(((i + chunk.length) / data.length) * 100));
-				// Small delay between chunks to avoid buffer overflow on Android
-				if (data.length > chunkSize) await sleep(30);
+				const chunk = data.slice(i, i+chunkSize);
+				noResp ? await btChar.writeValueWithoutResponse(chunk) : await btChar.writeValue(chunk);
+				showProgress(Math.round(((i+chunk.length)/data.length)*100));
+				if (data.length > chunkSize) await sleep(25);
 			}
-			showProgress(100);
-			setTimeout(() => showProgress(-1), 1000);
-			return; // success
+			showProgress(100); setTimeout(()=>showProgress(-1), 800);
+			log('พิมพ์สำเร็จ (chunk '+chunkSize+'B) ✓', 'ok'); setStatus('พิมพ์สำเร็จ','ok'); return;
 		} catch(e) {
-			if (ci < chunkSizes.length - 1) {
-				log(`Chunk ${chunkSize}B failed, retry with ${chunkSizes[ci+1]}B...`, 'warn');
-			} else {
-				throw e;
-			}
+			if (chunkSize > 20) log('Chunk '+chunkSize+'B ล้มเหลว → ลดขนาด', 'warn');
+			else { showProgress(-1); log('พิมพ์ล้มเหลว: '+e.message,'error'); alert('พิมพ์ไม่สำเร็จ:\n'+e.message); }
 		}
 	}
 }
 
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-/* ===================================================================
-   Preview & System Print
-   =================================================================== */
-function updatePreview() {
-	const zpl    = document.getElementById('txtZpl').value;
-	const width  = document.getElementById('txtPaperWidth').value  || 4;
-	const height = document.getElementById('txtPaperHeight').value || 6;
-	const url    = `https://api.labelary.com/v1/printers/8dpmm/labels/${width}x${height}/0/${encodeURIComponent(zpl)}`;
-	document.getElementById('labelPreview').src = url;
-	log(`Preview อัปเดต (${width}x${height} นิ้ว)`);
-	try {
-		localStorage.setItem('moda_latest_zpl',    zpl);
-		localStorage.setItem('moda_latest_width',  width);
-		localStorage.setItem('moda_latest_height', height);
-	} catch(e) {}
-}
-
+/* ============================================================
+   System Print
+   ============================================================ */
 function systemPrint() {
-	const img    = document.getElementById('labelPreview');
-	if (!img?.src) return alert('กรุณากด Preview ก่อนพิมพ์');
-	const width  = document.getElementById('txtPaperWidth').value  || 4;
-	const height = document.getElementById('txtPaperHeight').value || 6;
-	const pw = window.open('', '_blank');
-	pw.document.write(`<html><head><title>Print</title><style>
-		@page{size:${width}in ${height}in;margin:0}
-		body{margin:0;display:flex;justify-content:center;align-items:center;height:100vh}
-		img{width:100%;height:auto;display:block}
-	</style></head><body><img src="${img.src}" onload="window.print();setTimeout(()=>window.close(),500)"/></body></html>`);
+	const img = document.getElementById('labelPreview');
+	if (!img?.src || img.src === location.href) { alert('กรุณากด Preview ก่อน'); return; }
+	const w = document.getElementById('txtW').value || 4;
+	const h = document.getElementById('txtH').value || 6;
+	const pw = window.open('','_blank');
+	pw.document.write(`<!DOCTYPE html><html><head><title>Print</title>
+<style>@page{size:${w}in ${h}in;margin:0}body{margin:0;display:flex;justify-content:center;align-items:center;height:100vh}img{width:100%;height:auto}</style>
+</head><body><img src="${img.src}" onload="window.print();setTimeout(()=>window.close(),800)"/></body></html>`);
 	pw.document.close();
 }
 
-/* ===================================================================
-   Init
-   =================================================================== */
-function init() {
-	logEl = document.getElementById('log');
-	initUUIDList();
+/* ============================================================
+   printAuto / Preview / Helpers
+   ============================================================ */
+function printAuto() {
+	if (currentMethod==='bp')  printZplBP();
+	else if (currentMethod==='ble') printZplBLE();
+	else systemPrint();
+}
 
-	// Restore saved values
+function updatePreview() {
+	const zpl = document.getElementById('txtZpl').value;
+	const w   = document.getElementById('txtW').value || 4;
+	const h   = document.getElementById('txtH').value || 6;
+	const url = `https://api.labelary.com/v1/printers/8dpmm/labels/${w}x${h}/0/${encodeURIComponent(zpl)}`;
+	document.getElementById('labelPreview').src = url;
+	log('Preview ' + w + '×' + h + ' นิ้ว');
+	try { localStorage.setItem('moda_zpl',zpl); localStorage.setItem('moda_w',w); localStorage.setItem('moda_h',h); } catch(e){}
+}
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+/* ============================================================
+   Init
+   ============================================================ */
+window.onload = function() {
+	logEl = document.getElementById('log');
 	try {
-		const z = localStorage.getItem('moda_latest_zpl');
-		if (z) document.getElementById('txtZpl').value = z;
-		const w = localStorage.getItem('moda_latest_width');
-		if (w) document.getElementById('txtPaperWidth').value = w;
-		const h = localStorage.getItem('moda_latest_height');
-		if (h) document.getElementById('txtPaperHeight').value = h;
+		const z=localStorage.getItem('moda_zpl'); if(z) document.getElementById('txtZpl').value=z;
+		const w=localStorage.getItem('moda_w');   if(w) document.getElementById('txtW').value=w;
+		const h=localStorage.getItem('moda_h');   if(h) document.getElementById('txtH').value=h;
+		const m=localStorage.getItem('moda_mac'); if(m) document.getElementById('txtMac').value=m;
 	} catch(e){}
 
-	document.getElementById('btnScanAll').addEventListener('click',    connectBluetoothScanAll);
-	document.getElementById('btnBluetooth').addEventListener('click',  connectBluetooth);
-	document.getElementById('btnDisconnect').addEventListener('click', disconnectBluetooth);
-	document.getElementById('btnFindLocal').addEventListener('click',  findLocalPrinters);
-	document.getElementById('btnPrint').addEventListener('click',      printZpl);
-	document.getElementById('btnPreview').addEventListener('click',    updatePreview);
-	document.getElementById('btnSystemPrint').addEventListener('click',systemPrint);
-
-	log('MODA Bluetooth Print พร้อมใช้งาน', 'ok');
-	log(`Protocol: ${location.protocol} | BT Support: ${!!navigator.bluetooth}`);
-
-	if (!navigator.bluetooth) {
-		log('⚠️ Web Bluetooth ไม่รองรับ — ต้องใช้ Chrome + HTTPS', 'warn');
-	}
+	log('MODA BT Print v3 | Protocol: '+location.protocol+' | WebBT: '+!!navigator.bluetooth, 'info');
+	if (!navigator.bluetooth) log('Web Bluetooth ไม่รองรับ — ใช้ BrowserPrint หรือ System Print แทน', 'warn');
 
 	setTimeout(setupBrowserPrint, 800);
 	updatePreview();
-}
-
-window.onload = init;
+};
 </script>
 </body>
 </html>
