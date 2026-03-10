@@ -176,6 +176,12 @@
 			width: 100%;
 		}
 
+		.unit-selector {
+			width: auto;
+			padding: 8px;
+			margin-left: 10px;
+		}
+
 		@media print {
 			@page { margin: 0; }
 			body { margin: 0; padding: 0; }
@@ -269,8 +275,10 @@
 			try {
 				log('กำลังค้นหา Bluetooth Device...');
 				const device = await navigator.bluetooth.requestDevice({
-					filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }, { namePrefix: 'Zebra' }],
-					optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+					// filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }, { namePrefix: 'Zebra' }],
+					// optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+					acceptAllDevices: true, // Accept all devices to improve discovery
+					optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] // Still request the service if available
 				});
 
 				log('กำลังเชื่อมต่อ GATT...');
@@ -328,26 +336,47 @@
 
 		function updatePreview() {
 			const zpl = document.getElementById('<%= txtZpl.ClientID %>').value;
-			const width = document.getElementById('txtPaperWidth').value || 4;
-			const height = document.getElementById('txtPaperHeight').value || 6;
-			const url = `https://api.labelary.com/v1/printers/8dpmm/labels/${width}x${height}/0/${encodeURIComponent(zpl)}`;
+			const widthInput = document.getElementById('txtPaperWidth');
+			const heightInput = document.getElementById('txtPaperHeight');
+			const unitSelector = document.getElementById('unitSelector');
+
+			let width = parseFloat(widthInput.value) || 4;
+			let height = parseFloat(heightInput.value) || 6;
+			const unit = unitSelector.value;
+
+			// Convert to inches for Labelary API
+			let widthInInches = convertToInches(width, unit);
+			let heightInInches = convertToInches(height, unit);
+
+			const url = `https://api.labelary.com/v1/printers/8dpmm/labels/${widthInInches}x${heightInInches}/0/${encodeURIComponent(zpl)}`;
 			document.getElementById('labelPreview').src = url;
-			log(`อัปเดต Preview แล้ว (${width}x${height} นิ้ว)`);
+			log(`อัปเดต Preview แล้ว (${width} ${unit} x ${height} ${unit})`);
+			
 			localStorage.setItem('moda_latest_zpl', zpl);
 			localStorage.setItem('moda_latest_width', width);
 			localStorage.setItem('moda_latest_height', height);
+			localStorage.setItem('moda_latest_unit', unit);
 		}
 
 		function systemPrint() {
 			const labelImg = document.getElementById('labelPreview');
 			if (!labelImg || !labelImg.src) return alert('กรุณากด Preview ก่อนพิมพ์');
 			
-			const width = document.getElementById('txtPaperWidth').value || 4;
-			const height = document.getElementById('txtPaperHeight').value || 6;
+			const widthInput = document.getElementById('txtPaperWidth');
+			const heightInput = document.getElementById('txtPaperHeight');
+			const unitSelector = document.getElementById('unitSelector');
+
+			let width = parseFloat(widthInput.value) || 4;
+			let height = parseFloat(heightInput.value) || 6;
+			const unit = unitSelector.value;
+
+			// Convert to inches for @page size
+			let widthInInches = convertToInches(width, unit);
+			let heightInInches = convertToInches(height, unit);
 			
 			const printWindow = window.open('', '_blank');
 			printWindow.document.write(`<html><head><title>Print Label</title><style>
-				@page { size: ${width}in ${height}in; margin: 0; }
+				@page { size: ${widthInInches}in ${heightInInches}in; margin: 0; }
 				body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; } 
 				img { width: 100%; height: auto; display: block; }
 			</style></head><body>`);
@@ -356,10 +385,44 @@
 			printWindow.document.close();
 		}
 
+		function convertToInches(value, fromUnit) {
+			switch (fromUnit) {
+				case 'cm': return value / 2.54;
+				case 'mm': return value / 25.4;
+				case 'in':
+				default: return value;
+			}
+		}
+
+		function convertFromInches(valueInInches, toUnit) {
+			switch (toUnit) {
+				case 'cm': return (valueInInches * 2.54).toFixed(1);
+				case 'mm': return (valueInInches * 25.4).toFixed(0);
+				case 'in':
+				default: return valueInInches;
+			}
+		}
+
+		function handleUnitChange() {
+			const widthInput = document.getElementById('txtPaperWidth');
+			const heightInput = document.getElementById('txtPaperHeight');
+			const oldUnit = localStorage.getItem('moda_latest_unit') || 'in';
+			const newUnit = document.getElementById('unitSelector').value;
+
+			if (oldUnit !== newUnit) {
+				let currentWidthInInches = convertToInches(parseFloat(widthInput.value), oldUnit);
+				let currentHeightInInches = convertToInches(parseFloat(heightInput.value), oldUnit);
+
+				widthInput.value = convertFromInches(currentWidthInInches, newUnit);
+				heightInput.value = convertFromInches(currentHeightInInches, newUnit);
+			}
+			updatePreview();
+		}
+
 		function init() {
 			logEl = document.getElementById('log');
-			const saved = localStorage.getItem('moda_latest_zpl');
-			if (saved) document.getElementById('<%= txtZpl.ClientID %>').value = saved;
+			const savedZpl = localStorage.getItem('moda_latest_zpl');
+			if (savedZpl) document.getElementById('<%= txtZpl.ClientID %>').value = savedZpl;
 			
 			const savedWidth = localStorage.getItem('moda_latest_width');
 			if (savedWidth) document.getElementById('txtPaperWidth').value = savedWidth;
@@ -367,11 +430,18 @@
 			const savedHeight = localStorage.getItem('moda_latest_height');
 			if (savedHeight) document.getElementById('txtPaperHeight').value = savedHeight;
 
+			const savedUnit = localStorage.getItem('moda_latest_unit');
+			if (savedUnit) document.getElementById('unitSelector').value = savedUnit;
+
 			document.getElementById('btnBluetooth').addEventListener('click', connectBluetooth);
 			document.getElementById('btnFindLocal').addEventListener('click', findLocalPrinters);
 			document.getElementById('btnPrint').addEventListener('click', printZpl);
 			document.getElementById('btnPreview').addEventListener('click', updatePreview);
 			document.getElementById('btnSystemPrint').addEventListener('click', systemPrint);
+			
+			document.getElementById('unitSelector').addEventListener('change', handleUnitChange);
+			document.getElementById('txtPaperWidth').addEventListener('change', updatePreview);
+			document.getElementById('txtPaperHeight').addEventListener('change', updatePreview);
 
 			setTimeout(setupBrowserPrint, 1000);
 			updatePreview();
@@ -410,21 +480,29 @@
 		</div>
 
 		<div class="card">
-			<div class="section-title"><i class="fas fa-ruler-combined"></i> ตั้งค่าหน้ากระดาษ</div>
-			<div class="paper-size-group">
-				<div class="form-group">
-					<label>ความกว้าง (นิ้ว):</label>
-					<input type="number" id="txtPaperWidth" class="input-small" value="4" step="0.1" />
+				<div class="section-title"><i class="fas fa-ruler-combined"></i> ตั้งค่าหน้ากระดาษ</div>
+				<div class="paper-size-group">
+					<div class="form-group">
+						<label>ความกว้าง:</label>
+						<input type="number" id="txtPaperWidth" class="input-small" value="4" step="0.1" />
+					</div>
+					<div class="form-group">
+						<label>ความสูง:</label>
+						<input type="number" id="txtPaperHeight" class="input-small" value="6" step="0.1" />
+					</div>
+					<div class="form-group">
+						<label>หน่วย:</label>
+						<select id="unitSelector" class="unit-selector">
+							<option value="in">นิ้ว (in)</option>
+							<option value="cm">เซนติเมตร (cm)</option>
+							<option value="mm">มิลลิเมตร (mm)</option>
+						</select>
+					</div>
 				</div>
-				<div class="form-group">
-					<label>ความสูง (นิ้ว):</label>
-					<input type="number" id="txtPaperHeight" class="input-small" value="6" step="0.1" />
+				<div class="info-box" style="margin-bottom: 0;">
+					* ขนาดมาตรฐานทั่วไปคือ 4x6 นิ้ว
 				</div>
 			</div>
-			<div class="info-box" style="margin-bottom: 0;">
-				* ขนาดมาตรฐานทั่วไปคือ 4x6 นิ้ว
-			</div>
-		</div>
 
 			<div class="card">
 				<div class="section-title"><i class="fas fa-info-circle"></i> สถานะ: <span id="lblStatus">Idle</span></div>
