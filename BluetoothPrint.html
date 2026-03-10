@@ -246,9 +246,8 @@
 
 	<!-- Android hint -->
 	<div class="info-box">
-		<strong>Android / Chrome:</strong>
-		ใช้ <b>Connect Bluetooth (Web BT)</b> — ต้องเปิด Bluetooth และรันบน <b>HTTPS</b> เท่านั้น<br>
-		หากหาเครื่องพิมพ์ไม่พบให้ลอง <b>เปลี่ยน UUID Profile</b> ด้านล่าง หรือใช้ <b>System Print</b>
+		<strong>Android / Chrome:</strong> ต้องรันบน <b>HTTPS</b> เท่านั้น และเปิด Bluetooth ก่อน<br>
+		👉 แนะนำกด <b>"🔍 Scan ทุก Device"</b> — ระบบจะหา UUID ให้อัตโนมัติ ไม่ต้องเลือก Profile เอง
 	</div>
 
 	<!-- === SECTION: Connect === -->
@@ -262,18 +261,18 @@
 
 		<div class="btn-grid" style="margin-top:10px;">
 			<button id="btnFindLocal"  class="btn btn-secondary"><i class="fas fa-search"></i> ค้นหา (PC)</button>
-			<button id="btnBluetooth"  class="btn btn-primary"><i class="fab fa-bluetooth"></i> Connect Bluetooth (Web BT)</button>
-			<button id="btnDisconnect" class="btn btn-danger"  style="display:none;"><i class="fas fa-times-circle"></i> ตัดการเชื่อมต่อ</button>
+			<button id="btnScanAll"    class="btn btn-primary"><i class="fab fa-bluetooth-b"></i> 🔍 Scan ทุก Device<br><small style="font-weight:400;font-size:0.72rem;">แนะนำ Android — Auto detect UUID</small></button>
+			<button id="btnBluetooth"  class="btn btn-secondary"><i class="fas fa-filter"></i> Connect (Filter UUID)<br><small style="font-weight:400;font-size:0.72rem;">ใช้ UUID ที่เลือกด้านล่าง</small></button>
+			<button id="btnDisconnect" class="btn btn-danger" style="display:none;"><i class="fas fa-times-circle"></i> ตัดการเชื่อมต่อ</button>
 		</div>
 	</div>
 
 	<!-- === SECTION: UUID Profile selector === -->
 	<div class="card">
-		<div class="section-title"><i class="fas fa-cogs"></i> UUID Profile (Web Bluetooth)</div>
+		<div class="section-title"><i class="fas fa-cogs"></i> UUID Profile (สำหรับ Connect Filter UUID)</div>
 
 		<div class="warn-box">
-			⚠️ หากกด Connect แล้วหาเครื่องพิมพ์ไม่พบ ให้ลองเปลี่ยน Profile ด้านล่าง<br>
-			Zebra ZQ ส่วนใหญ่ใช้ <b>Zebra SPP (LE)</b> หรือ <b>Generic SPP</b>
+			⚠️ ใช้เฉพาะกรณีกด <b>Connect (Filter UUID)</b> — หากใช้ <b>Scan ทุก Device</b> ระบบเลือก UUID อัตโนมัติ ไม่ต้องตั้งค่านี้
 		</div>
 
 		<div class="uuid-list" id="uuidList">
@@ -462,63 +461,51 @@ function initUUIDList() {
 /* ===================================================================
    Web Bluetooth — Connect
    =================================================================== */
-async function connectBluetooth() {
-	if (isConnecting) return;
-	isConnecting = true;
 
-	// Check HTTPS
+// Known Zebra service UUIDs to probe (in priority order)
+const ZEBRA_SERVICE_UUIDS = [
+	{ label: 'Zebra SPP LE',   svc: '000018f0-0000-1000-8000-00805f9b34fb', char: '00002af1-0000-1000-8000-00805f9b34fb' },
+	{ label: 'Zebra ZSDK',     svc: '38eb4a80-c570-11e3-9507-0002a5d5c51b', char: 'be39ffa2-c570-11e3-9507-0002a5d5c51b' },
+	{ label: 'Nordic UART',    svc: '49535343-fe7d-4ae5-8fa9-9fafd205e455', char: '49535343-1e4d-4bd9-ba61-23c647249616' },
+	{ label: 'Generic FFE0',   svc: '0000ffe0-0000-1000-8000-00805f9b34fb', char: '0000ffe1-0000-1000-8000-00805f9b34fb' },
+	{ label: 'Generic SPP',    svc: '00001101-0000-1000-8000-00805f9b34fb', char: '' },
+];
+
+function checkBtPrerequisites() {
 	if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
 		log('ต้องการ HTTPS — Web Bluetooth ไม่ทำงานบน HTTP', 'warn');
 		alert('⚠️ Web Bluetooth ต้องการ HTTPS\nกรุณาเปิดหน้านี้ผ่าน HTTPS หรือ localhost');
-		isConnecting = false;
-		return;
+		return false;
 	}
-
 	if (!navigator.bluetooth) {
 		log('Browser ไม่รองรับ Web Bluetooth', 'error');
 		alert('Browser ไม่รองรับ Web Bluetooth\nกรุณาใช้ Chrome บน Android (ไม่ใช่ WebView)');
-		isConnecting = false;
-		return;
+		return false;
 	}
+	return true;
+}
+
+// โหมด 1: Scan ทุก device (แก้ปัญหาหาไม่เจอ)
+async function connectBluetoothScanAll() {
+	if (isConnecting) return;
+	if (!checkBtPrerequisites()) return;
+	isConnecting = true;
 
 	try {
-		updateStatus('กำลังค้นหา...', 'connecting');
-		log('เปิด Bluetooth picker...');
+		updateStatus('กำลังค้นหา (ทุก Device)...', 'connecting');
+		log('📡 Scan ALL devices — เลือกเครื่องพิมพ์จาก popup ได้เลย');
 
-		// Build requestDevice options
-		const svcUUID  = activeUUID.svc;
-		const charUUID = activeUUID.char;
+		btDevice = await navigator.bluetooth.requestDevice({
+			acceptAllDevices: true,
+			optionalServices: ZEBRA_SERVICE_UUIDS.map(u => u.svc).filter(Boolean)
+		});
 
-		const requestOptions = {
-			// acceptAllDevices: true รองรับทุก device แต่ต้องมี optionalServices
-			// filters ทำให้แสดงเฉพาะ device ที่มี service ที่ระบุ (แนะนำ)
-			filters: [
-				{ services: [svcUUID] },
-				{ namePrefix: 'Zebra'  },
-				{ namePrefix: 'ZQ'     },
-				{ namePrefix: 'ZD'     },
-				{ namePrefix: 'ZT'     },
-				{ namePrefix: 'GK'     },
-				{ namePrefix: 'GX'     },
-			],
-			optionalServices: [
-				'000018f0-0000-1000-8000-00805f9b34fb',
-				'38eb4a80-c570-11e3-9507-0002a5d5c51b',
-				'49535343-fe7d-4ae5-8fa9-9fafd205e455',
-				'0000ffe0-0000-1000-8000-00805f9b34fb',
-				svcUUID
-			].filter((v,i,a) => v && a.indexOf(v)===i)   // dedupe
-		};
+		log(`✅ เลือก Device: "${btDevice.name || '(ไม่มีชื่อ)'}"`, 'ok');
+		updateStatus(`กำลัง detect UUID: ${btDevice.name || 'device'}...`, 'connecting');
 
-		log(`ใช้ Profile: Svc=${svcUUID}`);
+		// Auto-detect UUID
+		await autoDetectAndConnect();
 
-		btDevice = await navigator.bluetooth.requestDevice(requestOptions);
-		log(`พบ Device: ${btDevice.name || '(ไม่มีชื่อ)'}`, 'ok');
-		updateStatus(`เชื่อมต่อ ${btDevice.name || 'device'}...`, 'connecting');
-
-		await doGattConnect(svcUUID, charUUID);
-
-		// Auto-reconnect on disconnect
 		btDevice.addEventListener('gattserverdisconnected', onDisconnected);
 
 	} catch (err) {
@@ -526,6 +513,104 @@ async function connectBluetooth() {
 	} finally {
 		isConnecting = false;
 	}
+}
+
+// โหมด 2: Connect ด้วย UUID ที่เลือกจาก profile list
+async function connectBluetooth() {
+	if (isConnecting) return;
+	if (!checkBtPrerequisites()) return;
+	isConnecting = true;
+
+	try {
+		updateStatus('กำลังค้นหา...', 'connecting');
+		const svcUUID  = activeUUID.svc;
+		const charUUID = activeUUID.char;
+		log(`🔍 Filter by UUID: ${svcUUID}`);
+
+		btDevice = await navigator.bluetooth.requestDevice({
+			filters: [
+				{ services: [svcUUID] },
+				{ namePrefix: 'Zebra' }, { namePrefix: 'ZQ' },
+				{ namePrefix: 'ZD'   }, { namePrefix: 'ZT' },
+				{ namePrefix: 'GK'   }, { namePrefix: 'GX' },
+				{ namePrefix: 'MODA' },
+			],
+			optionalServices: ZEBRA_SERVICE_UUIDS.map(u => u.svc).filter(Boolean)
+		});
+
+		log(`พบ Device: ${btDevice.name || '(ไม่มีชื่อ)'}`, 'ok');
+		updateStatus(`เชื่อมต่อ ${btDevice.name || 'device'}...`, 'connecting');
+
+		await doGattConnect(svcUUID, charUUID);
+		btDevice.addEventListener('gattserverdisconnected', onDisconnected);
+
+	} catch (err) {
+		handleBtError(err);
+	} finally {
+		isConnecting = false;
+	}
+}
+
+// Auto-detect UUID: ลองทีละ service จนสำเร็จ
+async function autoDetectAndConnect() {
+	log('🔎 Auto-detect UUID — กำลังทดสอบทีละ profile...');
+
+	// Connect GATT once
+	let server = null;
+	for (let attempt = 1; attempt <= 3; attempt++) {
+		try {
+			server = await btDevice.gatt.connect();
+			break;
+		} catch(e) {
+			log(`GATT attempt ${attempt}: ${e.message}`, 'warn');
+			if (attempt === 3) throw e;
+			await sleep(700 * attempt);
+		}
+	}
+	btServer = server;
+	log('GATT Connected ✓', 'ok');
+
+	// Get all services
+	let services = [];
+	try {
+		services = await server.getPrimaryServices();
+		log(`พบ ${services.length} service(s): ${services.map(s=>s.uuid).join(', ')}`);
+	} catch(e) {
+		log('ดึง services ไม่ได้: ' + e.message + ' — ลอง probe ทีละตัว', 'warn');
+	}
+
+	// Try each known UUID
+	for (const profile of ZEBRA_SERVICE_UUIDS) {
+		try {
+			log(`⏳ ทดสอบ [${profile.label}] svc=${profile.svc}`);
+			const svc   = await server.getPrimaryService(profile.svc);
+			const chars = await svc.getCharacteristics();
+			log(`   พบ ${chars.length} characteristic(s): ${chars.map(c=>c.uuid).join(', ')}`);
+
+			// Find writable char: prefer known UUID, fallback to first writable
+			let char = profile.char ? chars.find(c => c.uuid === profile.char) : null;
+			if (!char) char = chars.find(c => c.properties.write || c.properties.writeWithoutResponse);
+			if (!char) { log(`   ไม่พบ writable char`, 'warn'); continue; }
+
+			btChar = char;
+			activeUUID.svc  = profile.svc;
+			activeUUID.char = char.uuid;
+
+			// Update UI to reflect detected profile
+			document.querySelectorAll('.uuid-item').forEach(el => {
+				el.classList.toggle('active', el.dataset.svc === profile.svc);
+			});
+
+			updateStatus(`✅ เชื่อมต่อแล้ว: ${btDevice.name || 'Bluetooth'} [${profile.label}]`, 'connected');
+			log(`🎉 สำเร็จ! ใช้ Profile: ${profile.label} | Char: ${char.uuid}`, 'ok');
+			return;
+
+		} catch(e) {
+			log(`   ❌ [${profile.label}] ไม่รองรับ: ${e.message}`, 'warn');
+		}
+	}
+
+	throw new Error('ไม่พบ UUID ที่รองรับ — เครื่องพิมพ์นี้อาจไม่ใช่ Zebra หรือปิด BLE อยู่');
 }
 
 async function doGattConnect(svcUUID, charUUID) {
@@ -783,6 +868,7 @@ function init() {
 		if (h) document.getElementById('txtPaperHeight').value = h;
 	} catch(e){}
 
+	document.getElementById('btnScanAll').addEventListener('click',    connectBluetoothScanAll);
 	document.getElementById('btnBluetooth').addEventListener('click',  connectBluetooth);
 	document.getElementById('btnDisconnect').addEventListener('click', disconnectBluetooth);
 	document.getElementById('btnFindLocal').addEventListener('click',  findLocalPrinters);
