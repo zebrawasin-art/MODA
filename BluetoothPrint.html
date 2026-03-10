@@ -229,28 +229,32 @@
 				</div>
 			</div>
 
-			<!-- MAC Address (save for reference) -->
+			<!-- MAC Address — กรอกแล้ว Save จะเชื่อมต่ออัตโนมัติ -->
 			<div style="margin-bottom:12px;">
-				<label><i class="fas fa-tag"></i> MAC Address
-					<span style="font-weight:400; color:#999; font-size:.78rem;">(บันทึกไว้อ้างอิง — ระบบไม่ได้ใช้ filter)</span>
+				<label><i class="fas fa-tag"></i> MAC Address เครื่องพิมพ์
+					<span style="font-weight:400; color:#388e3c; font-size:.78rem;">— กรอกแล้วกด <b>บันทึก & เชื่อมต่อ</b></span>
 				</label>
 				<div class="input-row">
 					<input type="text" id="txtMac" placeholder="AC:3F:A4:11:22:33" maxlength="17"
 						oninput="formatMac(this)"
-						style="font-family:monospace; letter-spacing:1px; text-transform:uppercase;" />
-					<button class="btn btn-outline" onclick="saveMac()" style="white-space:nowrap; padding:10px 14px;">
-						<i class="fas fa-save"></i> บันทึก
+						style="font-family:monospace; letter-spacing:1.5px; text-transform:uppercase; font-size:.95rem;" />
+					<button class="btn btn-primary" onclick="saveMacAndConnect()" id="btnSaveMac" style="white-space:nowrap; padding:10px 14px;">
+						<i class="fas fa-save"></i> บันทึก &amp; เชื่อมต่อ
 					</button>
 				</div>
-				<div style="font-size:.73rem; color:#999; margin-top:4px;">
-					📍 ดู MAC: Android Settings → Bluetooth → กดค้างชื่อเครื่องพิมพ์ → รายละเอียด
+				<div style="font-size:.73rem; color:#888; margin-top:5px; line-height:1.6;">
+					📍 ดู MAC: Android Settings → Bluetooth → กดค้างชื่อเครื่องพิมพ์ → รายละเอียด<br>
+					⚡ เมื่อบันทึกแล้ว ระบบจะค้นหาและเชื่อมต่ออัตโนมัติทุกครั้งที่เปิดหน้านี้
 				</div>
 			</div>
 
 			<!-- Buttons -->
 			<div class="btn-grid">
 				<button class="btn btn-primary" id="btnConnectBLE" onclick="connectBLE()">
-					<i class="fab fa-bluetooth-b"></i> เลือกเครื่องพิมพ์
+					<i class="fab fa-bluetooth-b"></i> เลือกจาก Popup
+				</button>
+				<button class="btn btn-secondary" id="btnConnectByMac" onclick="connectByMac()" style="display:none;">
+					<i class="fas fa-crosshairs"></i> เชื่อมต่อจาก MAC
 				</button>
 				<button class="btn btn-danger" id="btnDisBLE" onclick="disconnectBLE()" style="display:none;">
 					<i class="fas fa-times-circle"></i> ตัดการเชื่อมต่อ
@@ -259,9 +263,22 @@
 
 			<div class="uuid-result" id="uuidResult"></div>
 
+			<!-- Send as file (Android Bluetooth SPP — ทำงานได้กับทุกรุ่น) -->
+			<div id="macPrintSection" style="display:none; margin-top:10px;">
+				<div class="ok-box" style="margin-bottom:8px; font-size:.78rem;">
+					✅ <b>ส่ง ZPL ตรงผ่าน Bluetooth SPP</b> — ทำงานเหมือนส่งไฟล์ Label.txt ไปยังเครื่องพิมพ์<br>
+					ไม่ต้องการ BLE — รองรับ <b>ทุกรุ่น Zebra</b> ที่ Pair แล้ว
+				</div>
+				<div class="btn-grid">
+					<button class="btn btn-success btn-full" onclick="printViaSPP()" id="btnPrintSPP">
+						<i class="fas fa-print"></i> พิมพ์ ZPL (Bluetooth SPP)
+					</button>
+				</div>
+			</div>
+
 			<button class="btn btn-success btn-full" onclick="printZplBLE()" id="btnPrintBLE"
 				style="margin-top:10px; opacity:.5; pointer-events:none;">
-				<i class="fas fa-print"></i> พิมพ์ ZPL ผ่าน BLE
+				<i class="fas fa-bluetooth-b"></i> พิมพ์ ZPL ผ่าน BLE
 			</button>
 		</div>
 	</div>
@@ -384,13 +401,151 @@ function formatMac(el) {
 	for (let i = 0; i < v.length; i++) { if (i && i%2===0) o+=':'; o+=v[i]; }
 	el.value = o;
 }
-function saveMac() {
-	const mac = document.getElementById('txtMac').value;
-	if (mac.length === 17) {
-		try { localStorage.setItem('moda_mac', mac); } catch(e){}
-		log('บันทึก MAC: ' + mac, 'ok');
-		alert('บันทึกแล้ว: ' + mac);
-	} else { alert('MAC ไม่ถูกต้อง — ต้องการรูปแบบ XX:XX:XX:XX:XX:XX'); }
+
+/* บันทึก MAC แล้วเชื่อมต่ออัตโนมัติ */
+async function saveMacAndConnect() {
+	const mac = document.getElementById('txtMac').value.trim().toUpperCase();
+	if (mac.length !== 17 || !/^([0-9A-F]{2}:){5}[0-9A-F]{2}$/.test(mac)) {
+		alert('MAC Address ไม่ถูกต้อง\nรูปแบบที่ต้องการ: XX:XX:XX:XX:XX:XX\nเช่น AC:3F:A4:11:22:33');
+		return;
+	}
+	try { localStorage.setItem('moda_mac', mac); } catch(e){}
+	log('บันทึก MAC: ' + mac + ' — เริ่มเชื่อมต่ออัตโนมัติ...', 'ok');
+
+	// แสดงปุ่ม "เชื่อมต่อจาก MAC" และ SPP section
+	document.getElementById('btnConnectByMac').style.display = '';
+	document.getElementById('macPrintSection').style.display = '';
+
+	// เริ่มเชื่อมต่ออัตโนมัติ
+	await connectByMac();
+}
+
+/* เชื่อมต่อโดยใช้ MAC — ลอง BLE ก่อน ถ้าไม่สำเร็จใช้ SPP */
+async function connectByMac() {
+	const mac = document.getElementById('txtMac').value.trim().toUpperCase();
+	if (!mac || mac.length !== 17) { alert('กรุณาใส่ MAC Address ก่อน'); return; }
+
+	// ถ้า Web Bluetooth ไม่รองรับ → ตรงไป SPP Mode ทันที
+	if (!navigator.bluetooth) {
+		log('Web BT ไม่รองรับ → ใช้ SPP Mode (ส่งไฟล์ผ่าน Bluetooth)', 'warn');
+		showSPPMode(mac);
+		return;
+	}
+	if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+		log('ไม่ใช่ HTTPS → ใช้ SPP Mode', 'warn');
+		showSPPMode(mac);
+		return;
+	}
+
+	if (isConnecting) return;
+	isConnecting = true;
+	setStatus('กำลังค้นหา MAC: ' + mac + '...', 'connecting');
+	document.getElementById('btnConnectBLE').disabled    = true;
+	document.getElementById('btnConnectByMac').disabled  = true;
+
+	try {
+		log('เปิด popup — เลือก device ที่มี MAC: ' + mac, 'info');
+		btDevice = await navigator.bluetooth.requestDevice({
+			acceptAllDevices: true,
+			optionalServices: ALL_SVCS
+		});
+
+		const devName = btDevice.name || '(ไม่มีชื่อ)';
+		// บันทึก device id ไว้ match ครั้งหน้า (Chrome Android ใช้ random id แทน MAC)
+		try { localStorage.setItem('moda_bt_id_' + mac, btDevice.id); } catch(e){}
+
+		log('เลือก: "' + devName + '"', 'ok');
+		setStatus('กำลังเชื่อมต่อ ' + devName + '...', 'connecting');
+		await doGATT();
+		btDevice.addEventListener('gattserverdisconnected', onBLEDis);
+		document.getElementById('btnDisBLE').style.display = '';
+
+	} catch(e) {
+		const m = e.message || '';
+		if (m.includes('cancel') || m.includes('User cancel') || m.includes('chooser')) {
+			log('ผู้ใช้ยกเลิก → ใช้ SPP Mode แทน', 'warn');
+			setStatus('ใช้ SPP Mode', 'connecting');
+		} else {
+			log('BLE Error: ' + m + ' → fallback SPP Mode', 'warn');
+			setStatus('BLE ไม่สำเร็จ → SPP Mode', 'connecting');
+		}
+		showSPPMode(mac);
+		setBLEReady(false);
+	} finally {
+		isConnecting = false;
+		document.getElementById('btnConnectBLE').disabled   = false;
+		document.getElementById('btnConnectByMac').disabled = false;
+	}
+}
+
+/* SPP Mode: แสดง device card + เตรียม print ผ่านไฟล์ */
+function showSPPMode(mac) {
+	document.getElementById('macPrintSection').style.display = '';
+	document.getElementById('bleDeviceCard').style.display   = 'block';
+	document.getElementById('bleDeviceName').textContent     = '🖨️ Zebra (' + mac + ')';
+	document.getElementById('bleDeviceProfile').textContent  = 'Bluetooth SPP (Classic) — ส่งไฟล์โดยตรง';
+	document.getElementById('bleConnDot').style.background   = '#ffc107';
+	setStatus('SPP Mode: ' + mac + ' — พร้อมพิมพ์', 'connecting');
+	log('SPP Mode พร้อม: กด "พิมพ์ ZPL (SPP)" เพื่อส่งไฟล์ไปเครื่องพิมพ์', 'info');
+}
+
+/* ส่ง ZPL ผ่าน Bluetooth SPP — สร้างไฟล์ .txt แล้ว share/download */
+async function printViaSPP() {
+	const mac = document.getElementById('txtMac').value.trim().toUpperCase();
+	const zpl = document.getElementById('txtZpl').value.trim();
+	if (!mac || mac.length !== 17) { alert('กรุณาใส่ MAC Address ก่อน'); return; }
+	if (!zpl) { alert('กรุณาใส่ ZPL'); return; }
+
+	log('เตรียมส่ง ZPL → ' + mac + ' (SPP)...', 'info');
+	showProgress(20);
+
+	const blob = new Blob([zpl], { type: 'text/plain' });
+	const file = new File([blob], 'label.txt', { type: 'text/plain' });
+
+	// Method 1: Web Share API พร้อมไฟล์ (Android Chrome 75+)
+	if (navigator.canShare && navigator.canShare({ files: [file] })) {
+		try {
+			log('เปิด Android Share sheet — เลือก Bluetooth → ' + mac, 'info');
+			showProgress(50);
+			await navigator.share({ title: 'ZPL Label', files: [file] });
+			showProgress(100); setTimeout(()=>showProgress(-1), 800);
+			log('Share สำเร็จ ✓ — เลือก Bluetooth ใน share sheet', 'ok');
+			setStatus('กำลังส่งผ่าน Bluetooth...', 'connecting');
+			return;
+		} catch(e) {
+			if (e.name === 'AbortError') { showProgress(-1); log('ผู้ใช้ยกเลิก', 'warn'); return; }
+			log('Web Share ล้มเหลว: ' + e.message, 'warn');
+		}
+	}
+
+	// Method 2: Download ไฟล์ แล้วให้ผู้ใช้ส่งผ่าน Bluetooth เอง
+	showProgress(80);
+	const url  = URL.createObjectURL(blob);
+	const link = document.createElement('a');
+	link.href     = url;
+	link.download = 'label.txt';
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+	setTimeout(() => URL.revokeObjectURL(url), 5000);
+	showProgress(100); setTimeout(()=>showProgress(-1), 800);
+
+	setStatus('ดาวน์โหลด label.txt — ส่งผ่าน Bluetooth ต่อ', 'connecting');
+	log('ดาวน์โหลด label.txt แล้ว', 'ok');
+
+	// แสดง guide
+	const existing = document.getElementById('sppGuide');
+	if (existing) existing.remove();
+	const div = document.createElement('div');
+	div.id = 'sppGuide';
+	div.style.cssText = 'background:#fff3cd;border-left:4px solid #ffc107;padding:10px;margin-top:10px;font-size:.8rem;line-height:1.9;border-radius:4px;';
+	div.innerHTML = `<b>📲 ขั้นตอนส่ง label.txt → Bluetooth:</b><br>
+1. เปิด <b>Files / My Files</b> → Downloads<br>
+2. เปิด <b>label.txt</b> → กด <b>Share</b><br>
+3. เลือก <b>Bluetooth</b> → เลือก <b>${mac}</b><br>
+4. เครื่องพิมพ์รับแล้วพิมพ์อัตโนมัติ ✓<br>
+<small style="color:#888;">* Pair เครื่องพิมพ์ใน Android Settings → Bluetooth ก่อน</small>`;
+	document.getElementById('macPrintSection').appendChild(div);
 }
 
 /* ============================================================
@@ -781,11 +936,20 @@ window.onload = function() {
 		const z=localStorage.getItem('moda_zpl'); if(z) document.getElementById('txtZpl').value=z;
 		const w=localStorage.getItem('moda_w');   if(w) document.getElementById('txtW').value=w;
 		const h=localStorage.getItem('moda_h');   if(h) document.getElementById('txtH').value=h;
-		const m=localStorage.getItem('moda_mac'); if(m) document.getElementById('txtMac').value=m;
+		const m=localStorage.getItem('moda_mac');
+		if(m) {
+			document.getElementById('txtMac').value = m;
+			// แสดงปุ่มและ SPP section เสมอเมื่อมี MAC
+			document.getElementById('btnConnectByMac').style.display = '';
+			document.getElementById('macPrintSection').style.display = '';
+			// Auto-connect เมื่อเปิดหน้า
+			log('พบ MAC ที่บันทึกไว้: ' + m + ' — เชื่อมต่ออัตโนมัติ...', 'info');
+			setTimeout(() => connectByMac(), 1200);
+		}
 	} catch(e){}
 
 	log('MODA BT Print v3 | Protocol: '+location.protocol+' | WebBT: '+!!navigator.bluetooth, 'info');
-	if (!navigator.bluetooth) log('Web Bluetooth ไม่รองรับ — ใช้ BrowserPrint หรือ System Print แทน', 'warn');
+	if (!navigator.bluetooth) log('Web Bluetooth ไม่รองรับ — ใช้ SPP Mode หรือ BrowserPrint แทน', 'warn');
 
 	setTimeout(setupBrowserPrint, 800);
 	updatePreview();
