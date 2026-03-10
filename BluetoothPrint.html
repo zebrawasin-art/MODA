@@ -5,7 +5,8 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-	<script type="text/javascript" src="./BrowserPrint-3.1.250.min.js"></script>
+	<!-- อ้างอิงไฟล์ BrowserPrint จาก Local หรือ URL ที่ถูกต้อง -->
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/viovendi/scandoo-dist@master/BrowserPrint-3.1.250.min.js"></script>
 	<style>
 		:root {
 			--primary: #0066cc;
@@ -25,907 +26,182 @@
 			background:#fff; border-radius:12px; box-shadow:var(--shadow);
 			padding:20px; max-width:800px; margin:0 auto;
 		}
-		.header {
-			display:flex; align-items:center; justify-content:space-between;
-			margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid #eee;
-			flex-wrap:wrap; gap:10px;
+		h1 { font-size:1.5rem; margin-bottom:15px; text-align:center; color:var(--primary); }
+		.card { margin-bottom:15px; border:1px solid #ddd; border-radius:8px; padding:15px; }
+		.card-title { font-weight:bold; margin-bottom:10px; font-size:0.9rem; text-transform:uppercase; color:var(--secondary); }
+		
+		.form-group { margin-bottom:10px; }
+		label { display:block; font-size:0.85rem; margin-bottom:4px; font-weight:600; }
+		input, textarea {
+			width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; font-size:0.9rem;
+			font-family: 'Courier New', monospace;
 		}
-		.logo { font-size:1.4rem; font-weight:700; display:flex; align-items:center; gap:8px; }
-		.logo i { color:var(--primary); }
-		.nav-buttons { display:flex; gap:8px; }
-		.btn-nav {
-			background:#f8f9fa; color:#333; border:1px solid #ddd;
-			padding:7px 12px; border-radius:6px; text-decoration:none;
-			font-size:0.82rem; display:flex; align-items:center; gap:5px;
+		.btn-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+		button {
+			flex:1; padding:12px; border:none; border-radius:6px; cursor:pointer;
+			font-weight:bold; font-size:0.9rem; color:#fff; transition: opacity 0.2s;
+			display: flex; align-items: center; justify-content: center; gap:8px;
 		}
-		.card {
-			background:#fff; border-radius:8px; padding:15px;
-			margin-bottom:14px; border:1px solid #eee;
+		button:active { opacity:0.7; }
+		.btn-primary { background: var(--primary); }
+		.btn-success { background: var(--success); }
+		.btn-warning { background: var(--warning); }
+		.btn-danger  { background: var(--danger); }
+		
+		#log {
+			background:#222; color:#0f0; padding:10px; border-radius:6px;
+			font-size:0.8rem; height:120px; overflow-y:auto; margin-top:10px;
+			font-family: 'Consolas', monospace; white-space: pre-wrap;
 		}
-		.section-title {
-			font-size:0.97rem; font-weight:700; margin-bottom:12px;
-			display:flex; align-items:center; gap:8px; color:#222;
-		}
-		.info-box  { background:#e7f3ff; border-left:4px solid var(--primary); padding:10px; margin-bottom:12px; font-size:0.8rem; line-height:1.6; }
-		.warn-box  { background:#fff3cd; border-left:4px solid #ffc107;        padding:10px; margin-bottom:12px; font-size:0.8rem; line-height:1.6; }
-		.error-box { background:#fde8e8; border-left:4px solid var(--danger);  padding:10px; margin-bottom:12px; font-size:0.8rem; line-height:1.6; }
-		.ok-box    { background:#d4edda; border-left:4px solid var(--success);  padding:10px; margin-bottom:12px; font-size:0.8rem; line-height:1.6; }
-
-		label { display:block; font-weight:600; margin-bottom:5px; font-size:0.84rem; }
-		input, select, textarea {
-			width:100%; padding:10px; border:1px solid #ddd;
-			border-radius:6px; font-size:0.9rem; font-family:inherit;
-		}
-		input:focus, select:focus, textarea:focus { outline:none; border-color:var(--primary); }
-
-		.input-row { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:end; }
-
-		.btn {
-			padding:11px 16px; border-radius:7px; font-weight:700; cursor:pointer;
-			border:none; font-size:0.85rem; display:inline-flex; align-items:center;
-			justify-content:center; gap:7px; transition:filter .15s;
-			white-space:nowrap; line-height:1.3; text-align:center;
-		}
-		.btn:active  { filter:brightness(.88); }
-		.btn:disabled { opacity:.5; cursor:not-allowed; }
-		.btn-primary   { background:var(--primary);   color:#fff; }
-		.btn-success   { background:var(--success);   color:#fff; }
-		.btn-secondary { background:var(--secondary); color:#fff; }
-		.btn-warning   { background:var(--warning);   color:#fff; }
-		.btn-danger    { background:var(--danger);    color:#fff; }
-		.btn-outline   { background:#fff; color:var(--primary); border:2px solid var(--primary); }
-		.btn-full { width:100%; }
-		.btn-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px; margin-top:10px; }
-
-		/* Status */
-		.status-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-		.status-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; transition:background .3s; }
-		.dot-green  { background:#28a745; box-shadow:0 0 7px #28a74566; }
-		.dot-yellow { background:#ffc107; box-shadow:0 0 7px #ffc10766; animation:pulse 1s infinite; }
-		.dot-red    { background:#dc3545; }
-		@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
-
-		/* Method tabs */
-		.method-tabs {
-			display:flex; border:1.5px solid var(--primary); border-radius:9px;
-			overflow:hidden; margin-bottom:15px;
-		}
-		.method-tab {
-			flex:1; padding:10px 6px; font-size:0.82rem; font-weight:700;
-			text-align:center; cursor:pointer; background:#fff; color:var(--primary);
-			border:none; border-right:1px solid #c0d8f0; transition:background .15s;
-		}
-		.method-tab:last-child { border-right:none; }
-		.method-tab.active { background:var(--primary); color:#fff; }
-
-		.zpl-editor { height:150px; font-family:monospace; background:#f8f9fa; font-size:.82rem; }
-		.log-editor { height:120px; font-family:monospace; background:#1a1a2e; color:#00ff88; font-size:.72rem; resize:vertical; }
-
-		.preview-box {
-			text-align:center; padding:10px; background:#f8f9fa;
-			border:1px dashed #ccc; border-radius:8px; min-height:60px;
-			display:flex; align-items:center; justify-content:center;
-		}
-		.preview-box img { max-width:100%; height:auto; }
-
-		.paper-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
-
-		.progress-wrap { background:#eee; border-radius:4px; height:7px; margin-top:8px; display:none; }
-		.progress-bar  { background:var(--primary); height:7px; border-radius:4px; width:0%; transition:width .2s; }
-
-		.steps { padding:4px 0; }
-		.step-item {
-			display:flex; gap:10px; align-items:flex-start;
-			padding:7px 0; border-bottom:1px solid #f3f3f3; font-size:.82rem;
-		}
-		.step-item:last-child { border-bottom:none; }
-		.step-num {
-			min-width:22px; height:22px; border-radius:50%;
-			background:var(--primary); color:#fff; font-size:.73rem;
-			font-weight:700; display:flex; align-items:center;
-			justify-content:center; flex-shrink:0; margin-top:1px;
-		}
-
-		.uuid-result {
-			display:none; margin-top:10px; background:#f0fff4; border:1px solid #b7eac8;
-			border-radius:6px; padding:10px; font-size:.78rem; font-family:monospace; line-height:1.7;
-		}
-
-		@media print {
-			@page { margin:0; }
-			body * { visibility:hidden; }
-			.preview-box, .preview-box img { visibility:visible; }
-			.preview-box {
-				position:absolute; left:0; top:0; width:100%; height:100%;
-				display:flex; justify-content:center; align-items:center;
-				background:white !important; border:none !important; padding:0 !important;
-			}
-			.preview-box img { width:100%; height:auto; }
-		}
+		.preview-box { text-align:center; margin-top:15px; }
+		#labelPreview { max-width:100%; border:1px dashed #aaa; padding:5px; background:#fafafa; }
+		.status-dot { height:10px; width:10px; border-radius:50%; display:inline-block; margin-right:5px; }
+		.online { background: #28a745; box-shadow: 0 0 5px #28a745; }
+		.offline { background: #dc3545; }
 	</style>
 </head>
 <body>
+
 <div class="container">
+	<h1><i class="fas fa-print"></i> MODA Zebra Print</h1>
 
-	<!-- Header -->
-	<div class="header">
-		<div class="logo"><i class="fab fa-bluetooth-b"></i> MODA Bluetooth</div>
-		<div class="nav-buttons">
-			<a href="WifiPrint.html" class="btn-nav"><i class="fas fa-wifi"></i> WiFi</a>
-			<a href="index.html"     class="btn-nav"><i class="fas fa-home"></i> Home</a>
-		</div>
-	</div>
-
-	<!-- Status -->
 	<div class="card">
-		<div class="section-title"><i class="fas fa-circle-dot"></i> สถานะ</div>
-		<div class="status-row">
-			<div class="status-dot dot-red" id="statusDot"></div>
-			<span id="lblStatus" style="font-weight:600; font-size:.9rem;">ยังไม่ได้เชื่อมต่อ</span>
+		<div class="card-title">การเชื่อมต่อเครื่องพิมพ์</div>
+		<div class="form-group">
+			<label>สถานะเครื่องพิมพ์: <span id="statusIcon" class="status-dot offline"></span> <span id="statusText">ยังไม่เชื่อมต่อ</span></label>
+			<input type="text" id="txtPrinterName" placeholder="เลือกเครื่องพิมพ์..." readonly onclick="findPrinters()" />
 		</div>
-		<div class="progress-wrap" id="progressWrap">
-			<div class="progress-bar" id="progressBar"></div>
-		</div>
-	</div>
-
-	<!-- Method Tabs -->
-	<div class="method-tabs">
-		<button class="method-tab active" id="tab-bp"  onclick="switchMethod('bp')">
-			<i class="fab fa-bluetooth-b"></i> Bluetooth Print<br><small style="font-weight:400">BrowserPrint — แนะนำ</small>
-		</button>
-		<button class="method-tab" id="tab-sys" onclick="switchMethod('sys')">
-			<i class="fas fa-file-pdf"></i> PDF Print<br><small style="font-weight:400">Universal</small>
-		</button>
-	</div>
-
-	<!-- ===== PANEL: BrowserPrint Bluetooth ===== -->
-	<div id="panel-bp">
-		<div class="card">
-			<div class="section-title"><i class="fab fa-bluetooth-b"></i> Bluetooth Print ผ่าน BrowserPrint</div>
-
-			<div class="ok-box">
-				✅ รองรับ <b>ทุกรุ่น Zebra</b> — ทั้ง Bluetooth Classic (SPP) และ BLE<br>
-				ส่ง ZPL โดยตรงผ่าน <code>BrowserPrint.js</code> → <code>device.send()</code>
-			</div>
-
-			<!-- Connected device card -->
-			<div id="bpDeviceCard" style="display:none; background:#f0fff4; border:1.5px solid #28a745; border-radius:8px; padding:12px; margin-bottom:12px;">
-				<div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-					<div style="width:38px;height:38px;border-radius:50%;background:#28a745;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-						<i class="fab fa-bluetooth-b" style="color:#fff;font-size:1.1rem;"></i>
-					</div>
-					<div style="flex:1; min-width:0;">
-						<div id="bpDeviceName" style="font-weight:700; font-size:.95rem; color:#155724;"></div>
-						<div id="bpDeviceInfo" style="font-size:.75rem; color:#388e3c; margin-top:2px; font-family:monospace;"></div>
-						<div id="bpDeviceStatus" style="font-size:.72rem; color:#555; margin-top:3px;"></div>
-					</div>
-					<div id="bpConnDot" style="width:11px;height:11px;border-radius:50%;background:#28a745;box-shadow:0 0 6px #28a74588;flex-shrink:0;"></div>
-				</div>
-			</div>
-
-			<!-- MAC Address input -->
-			<div style="margin-bottom:14px;">
-				<label><i class="fas fa-tag"></i> MAC Address เครื่องพิมพ์
-					<span style="font-weight:400;color:#888;font-size:.77rem;"> — ใส่แล้วกด <b>ค้นหา &amp; เชื่อมต่อ</b></span>
-				</label>
-				<div class="input-row">
-					<input type="text" id="txtMac" placeholder="AC:3F:A4:11:22:33" maxlength="17"
-						oninput="formatMac(this)"
-						style="font-family:monospace;letter-spacing:1.5px;text-transform:uppercase;font-size:.95rem;" />
-					<button class="btn btn-primary" onclick="findAndConnectByMac()" id="btnFindMac" style="padding:10px 14px;">
-						<i class="fas fa-crosshairs"></i> ค้นหา &amp; เชื่อมต่อ
-					</button>
-				</div>
-				<div style="font-size:.72rem;color:#999;margin-top:5px;line-height:1.7;">
-					📍 ดู MAC: Android Settings → Bluetooth → กดค้างชื่อเครื่องพิมพ์ → รายละเอียด<br>
-					💾 MAC จะถูกจำไว้ และเชื่อมต่ออัตโนมัติครั้งถัดไป
-				</div>
-			</div>
-
-			<!-- Printer list from BrowserPrint -->
-			<label><i class="fas fa-print"></i> เครื่องพิมพ์ที่พบ (BrowserPrint):</label>
-			<select id="selected_device" style="margin-bottom:10px;">
-				<option value="">-- กด "ค้นหาทั้งหมด" หรือใส่ MAC ด้านบน --</option>
-			</select>
-
-			<div class="btn-grid">
-				<button class="btn btn-secondary" onclick="findAllPrinters()" id="btnFindAll">
-					<i class="fas fa-search"></i> ค้นหาทั้งหมด
-				</button>
-				<button class="btn btn-primary" onclick="connectSelected()" id="btnConnSel">
-					<i class="fas fa-plug"></i> เชื่อมต่อที่เลือก
-				</button>
-				<button class="btn btn-danger" onclick="disconnectBP()" id="btnDisBP" style="display:none;">
-					<i class="fas fa-times-circle"></i> ตัดการเชื่อมต่อ
-				</button>
-			</div>
-
-			<!-- Status result -->
-			<div id="bpStatusBox" style="display:none; margin-top:10px; padding:10px; border-radius:6px; font-size:.8rem; line-height:1.6;"></div>
-
-			<!-- Print button -->
-			<button class="btn btn-success btn-full" onclick="printZplBP()" id="btnPrintBP"
-				style="margin-top:12px; opacity:.5; pointer-events:none;">
-				<i class="fas fa-print"></i> พิมพ์ ZPL ผ่าน Bluetooth
-			</button>
+		<div class="btn-row">
+			<button class="btn-primary" onclick="setupBrowserPrint()"><i class="fas fa-sync"></i> ตรวจสอบ Service</button>
+			<button class="btn-warning" onclick="findPrinters()"><i class="fas fa-search"></i> ค้นหาเครื่องพิมพ์</button>
 		</div>
 	</div>
 
-	<!-- ===== PANEL: System Print ===== -->
-	<div id="panel-sys" style="display:none;">
-		<div class="card">
-			<div class="section-title"><i class="fas fa-file-pdf"></i> PDF Print</div>
-			<div class="ok-box">✅ สร้าง PDF ขนาดตรงตาม Label แล้วเปิดหน้าพิมพ์ Android ขึ้นมาทันที</div>
-			<div class="steps">
-				<div class="step-item"><div class="step-num">1</div><div>ตั้งขนาดกระดาษใน <b>ตั้งค่าหน้ากระดาษ</b> ด้านล่าง</div></div>
-				<div class="step-item"><div class="step-num">2</div><div>กด <b>Preview</b> เพื่อสร้างภาพ Label</div></div>
-				<div class="step-item"><div class="step-num">3</div><div>กด <b>พิมพ์</b> — หน้าพิมพ์ Android จะเปิดขึ้นมาอัตโนมัติ</div></div>
-			</div>
-			<div class="btn-grid" style="margin-top:12px;">
-				<button class="btn btn-secondary" onclick="updatePreview()"><i class="fas fa-eye"></i> Preview</button>
-				<button class="btn btn-danger"    onclick="generatePDF()"><i class="fas fa-print"></i> พิมพ์</button>
-			</div>
-			<!-- hidden elements for PDF generation -->
-			<canvas id="pdfCanvas" style="display:none;"></canvas>
-			<iframe id="printFrame" style="display:none; width:0; height:0; border:none;"></iframe>
-		</div>
-	</div>
-
-	<!-- Paper Size -->
 	<div class="card">
-		<div class="section-title"><i class="fas fa-ruler-combined"></i> ตั้งค่าหน้ากระดาษ</div>
-		<div class="paper-row">
-			<div><label>ความกว้าง (นิ้ว):</label><input type="number" id="txtW" value="4" step="0.1" min="1" max="12" /></div>
-			<div><label>ความสูง (นิ้ว):</label><input type="number"  id="txtH" value="6" step="0.1" min="1" max="24" /></div>
-		</div>
-		<div class="info-box" style="margin-bottom:0;">* ขนาดมาตรฐานทั่วไปคือ 4×6 นิ้ว</div>
-	</div>
-
-	<!-- ZPL -->
-	<div class="card">
-		<div class="section-title"><i class="fas fa-code"></i> ZPL Code</div>
-		<textarea id="txtZpl" class="zpl-editor">^XA
-^PW600
-^LL300
-^FO40,40^A0N,40,40^FDMODA LABEL^FS
-^FO40,90^A0N,28,28^FDPART NO: RCX316D005^FS
-^FO40,130^A0N,28,28^FDBARCODE:^FS
-^FO40,160^BCN,60,Y,N,N^FD123456789^FS
-^PQ1,1,1,Y
+		<div class="card-title">ZPL Commands</div>
+		<div class="form-group">
+			<textarea id="txtZpl" rows="6">^XA
+^FX MODA TEST LABEL
+^CF0,60
+^FO50,50^FDMODA ZPL^FS
+^CF0,30
+^FO50,130^FDTest Printing via BrowserPrint^FS
+^FO50,180^FDDate: 10/03/2026^FS
+^FO50,230^GB700,1,3^FS
 ^XZ</textarea>
-		<div class="btn-grid">
-			<button class="btn btn-secondary" onclick="updatePreview()"><i class="fas fa-eye"></i> Preview</button>
-			<button class="btn btn-success"   onclick="printAuto()"><i class="fas fa-print"></i> พิมพ์</button>
+		</div>
+		<div class="btn-row">
+			<button class="btn-success" id="btnPrint" onclick="printZpl()"><i class="fas fa-paper-plane"></i> สั่งพิมพ์ (Print)</button>
+			<button class="btn-primary" onclick="updatePreview()"><i class="fas fa-eye"></i> ดูตัวอย่าง (Preview)</button>
 		</div>
 	</div>
 
-	<!-- Preview -->
-	<div class="card">
-		<div class="section-title"><i class="fas fa-image"></i> Label Preview</div>
-		<div class="preview-box"><img id="labelPreview" src="" alt="กด Preview เพื่อดูตัวอย่าง" /></div>
+	<div class="preview-box">
+		<img id="labelPreview" src="https://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/%5EXA%5EXZ" alt="Label Preview" />
+		<div style="font-size:0.7rem; color:#888; margin-top:4px;">Powered by Labelary API</div>
 	</div>
 
-	<!-- Log -->
-	<div class="card">
-		<div class="section-title">
-			<i class="fas fa-terminal"></i> Log
-			<button onclick="document.getElementById('log').value=''"
-				style="margin-left:auto;padding:3px 8px;font-size:.7rem;border:1px solid #ccc;border-radius:4px;cursor:pointer;background:#f8f9fa;">
-				Clear
-			</button>
-		</div>
-		<textarea id="log" class="log-editor" readonly></textarea>
-	</div>
+	<div id="log">รอรับคำสั่ง...</div>
+</div>
 
-</div><!-- /container -->
-<script>
-/* ============================================================
-   MODA BT Print v4
-   Bluetooth via BrowserPrint-3.1.250.min.js (Official Zebra API)
+<script type="text/javascript">
+	let selectedDevice = null;
+	let logEl = document.getElementById('log');
 
-   BrowserPrint API (base):
-     BrowserPrint.getDefaultDevice(type, success, error)
-     BrowserPrint.getLocalDevices(success, error, typeFilter)
-     BrowserPrint.getApplicationConfiguration(success, error)
-     device.send(data, success, error)
-     device.read(success, error)
-     device.sendThenRead(data, success, error)
-
-   Zebra.Printer API (high-level, requires BrowserPrint-Zebra-*.min.js):
-     new Zebra.Printer(device)
-     printer.getStatus(success, error)
-     printer.isPrinterReady()          → Promise
-     printer.write(data)               → Promise
-     printer.getConfiguration(cb, err)
-     printer.getSGD(setting, cb, err)
-     printer.getInfo(cb, err)
-
-   NOTE: BrowserPrint app ต้องรันอยู่บน Android
-         รองรับ Bluetooth Classic เท่านั้น (ไม่ใช่ BLE)
-         Port: http://localhost:9100 (HTTP) / https://localhost:9101 (HTTPS)
-   ============================================================ */
-
-var logEl, currentMethod = 'bp';
-var bpDevice      = null;   // BrowserPrint.Device object ที่เลือก
-var zebraPrinter  = null;   // Zebra.Printer object (high-level API)
-var allDevices    = [];     // รายการเครื่องพิมพ์ทั้งหมดที่พบ
-
-/* -- Log -- */
-function log(msg, type) {
-	const icon = {ok:'✅',error:'❌',warn:'⚠️',info:'ℹ️'}[type] || '▶';
-	const ts   = new Date().toLocaleTimeString('th-TH');
-	if (logEl) { logEl.value += `[${ts}] ${icon} ${msg}\n`; logEl.scrollTop = logEl.scrollHeight; }
-}
-
-/* -- Status dot -- */
-function setStatus(msg, state) {
-	document.getElementById('lblStatus').textContent = msg;
-	const cls = {ok:'dot-green', connecting:'dot-yellow', error:'dot-red', idle:'dot-red'};
-	document.getElementById('statusDot').className = 'status-dot ' + (cls[state] || 'dot-red');
-}
-
-/* -- Progress -- */
-function showProgress(pct) {
-	document.getElementById('progressWrap').style.display = (pct < 0 || pct >= 100) ? 'none' : 'block';
-	document.getElementById('progressBar').style.width = Math.max(0, Math.min(100, pct)) + '%';
-}
-
-/* -- Tabs (2 tabs only) -- */
-function switchMethod(m) {
-	currentMethod = m;
-	['bp','sys'].forEach(id => {
-		document.getElementById('tab-'  + id).classList.toggle('active', id === m);
-		document.getElementById('panel-'+ id).style.display = (id === m) ? '' : 'none';
-	});
-}
-
-/* -- MAC formatter -- */
-function formatMac(el) {
-	let v = el.value.replace(/[^0-9a-fA-F]/g,'').toUpperCase().slice(0,12);
-	let o = '';
-	for (let i = 0; i < v.length; i++) { if (i && i%2===0) o+=':'; o+=v[i]; }
-	el.value = o;
-}
-
-/* ============================================================
-   BrowserPrint — ฟังก์ชันหลัก
-   API: http://localhost:9100  (HTTP) / https://localhost:9101 (HTTPS)
-   device.send(data, successCb, errorCb)
-   device.read(successCb, errorCb)
-   device.sendThenRead(data, successCb, errorCb)
-   ============================================================ */
-
-/* ============================================================
-   BrowserPrint — Core Functions
-   ใช้ Official API ของ BrowserPrint-3.1.250.min.js
-
-   Base API:
-     BrowserPrint.getDefaultDevice(type, success, error)
-     BrowserPrint.getLocalDevices(success, error, typeFilter)
-     BrowserPrint.getApplicationConfiguration(success, error)
-     device.send(data, success, error)
-     device.read(success, error)
-     device.sendThenRead(data, success, error)
-
-   Zebra High-Level API (ต้องโหลด BrowserPrint-Zebra-*.min.js ด้วย):
-     new Zebra.Printer(device)
-     printer.getStatus(success, error)   → status.getMessage(), status.isPrinterReady()
-     printer.isPrinterReady()            → Promise
-     printer.write(zpl)                  → Promise
-   ============================================================ */
-
-/** enable/disable ปุ่มพิมพ์ */
-function setBPReady(ready) {
-	const btn = document.getElementById('btnPrintBP');
-	btn.style.opacity       = ready ? '1'    : '.5';
-	btn.style.pointerEvents = ready ? 'auto' : 'none';
-}
-
-/** แสดง device card */
-function showBPDeviceCard(device) {
-	document.getElementById('bpDeviceCard').style.display = 'block';
-	document.getElementById('bpDeviceName').textContent   =
-		'\u{1F5A8}\uFE0F ' + (device.name || device.uid || 'Zebra Printer');
-	document.getElementById('bpDeviceInfo').textContent   =
-		'UID: ' + device.uid + '  |  ' + (device.connection || 'bluetooth').toUpperCase();
-	document.getElementById('bpConnDot').style.background = '#28a745';
-}
-
-/** ซ่อน device card / reset state */
-function hideBPDeviceCard() {
-	document.getElementById('bpDeviceCard').style.display = 'none';
-	document.getElementById('bpStatusBox').style.display  = 'none';
-	setBPReady(false);
-	bpDevice     = null;
-	zebraPrinter = null;
-}
-
-/** แสดง status box */
-function showStatusBox(html, isOk) {
-	const box = document.getElementById('bpStatusBox');
-	box.style.display    = 'block';
-	box.style.background = isOk ? '#d4edda' : '#fff3cd';
-	box.style.borderLeft = '4px solid ' + (isOk ? '#28a745' : '#ffc107');
-	box.innerHTML        = html;
-}
-
-/** ตรวจว่า BrowserPrint.js โหลดแล้ว */
-function checkBP() {
-	if (typeof BrowserPrint === 'undefined') {
-		showBPInstallGuide();
-		log('BrowserPrint.js ไม่พบ — ต้องมีไฟล์ BrowserPrint-3.1.250.min.js', 'error');
-		return false;
+	function log(msg, type = 'info') {
+		const now = new Date().toLocaleTimeString();
+		const color = type === 'error' ? '#ff5555' : (type === 'success' ? '#55ff55' : '#00ff00');
+		logEl.innerHTML += `<span style="color:${color}">[${now}] ${msg}</span>\n`;
+		logEl.scrollTop = logEl.scrollHeight;
 	}
-	return true;
-}
 
-/* ============================================================
-   setupBrowserPrint — เรียกเมื่อ page โหลด
-   Best Practice: เรียก getDefaultDevice + getLocalDevices พร้อมกัน
-   ============================================================ */
-function setupBrowserPrint() {
-	if (!checkBP()) return;
+	function setStatus(isOnline, text) {
+		const dot = document.getElementById('statusIcon');
+		const txt = document.getElementById('statusText');
+		dot.className = isOnline ? 'status-dot online' : 'status-dot offline';
+		txt.innerText = text || (isOnline ? 'พร้อมใช้งาน' : 'ยังไม่พร้อม');
+	}
 
-	log('BrowserPrint v3.1.250 — เชื่อมต่อ service...', 'info');
-	setStatus('กำลังเชื่อมต่อ BrowserPrint...', 'connecting');
+	/* ============================================================
+	   BrowserPrint API Core
+	   ============================================================ */
 
-	/* Step 1: getDefaultDevice ก่อน — เร็วกว่า discovery เพราะดึงแบบ static */
-	BrowserPrint.getDefaultDevice('printer',
-		function(device) {
-			if (device && device.uid) {
-				log('Default device: ' + device.name + ' [' + device.connection + ']', 'ok');
-				if (!bpDevice) activateDevice(device);
+	// ตรวจสอบว่า Browser Print Service กำลังทำงานหรือไม่
+	function setupBrowserPrint() {
+		log('กำลังตรวจสอบ Browser Print Service...');
+		
+		// BrowserPrint.getDefaultDevice(type, success, error)
+		BrowserPrint.getDefaultDevice("printer", function(device) {
+			if (device != null) {
+				selectedDevice = device;
+				document.getElementById('txtPrinterName').value = device.name;
+				setStatus(true, "เครื่องพิมพ์พื้นฐาน: " + device.name);
+				log('พบเครื่องพิมพ์พื้นฐาน: ' + device.name, 'success');
 			} else {
-				log('ไม่มี Default Device — รอ getLocalDevices', 'info');
+				log('ไม่พบเครื่องพิมพ์พื้นฐาน กรุณาค้นหาเครื่องพิมพ์', 'warning');
+				setStatus(false, "ไม่พบเครื่องพิมพ์");
 			}
-		},
-		function(err) {
-			log('getDefaultDevice: ' + (err || 'BrowserPrint ไม่ตอบ'), 'warn');
-		}
-	);
-
-	/* Step 2: getLocalDevices — ค้นหาทุก device (ใช้เวลาเพราะ BT discovery) */
-	BrowserPrint.getLocalDevices(
-		function(deviceList) {
-			/* API v3.1 คืนค่าเป็น object {printer:[...]} หรือ array */
-			const list = normalizeDeviceList(deviceList);
-			allDevices = list;
-			populateDropdown(list);
-
-			if (list.length === 0) { log('getLocalDevices: ไม่พบเครื่อง', 'warn'); return; }
-			log('getLocalDevices: พบ ' + list.length + ' เครื่อง', 'ok');
-
-			if (!bpDevice) {
-				const savedMac = (() => { try{ return localStorage.getItem('moda_mac'); }catch(e){return null;} })();
-				const matched  = savedMac ? matchDeviceByMac(list, savedMac) : null;
-				if (matched) { activateDevice(matched); }
-				else if (list.length === 1) { activateDevice(list[0]); }
-			}
-		},
-		function(err) {
-			log('getLocalDevices error: ' + (err || 'ไม่ตอบ'), 'error');
-			setStatus('BrowserPrint ไม่ตอบสนอง', 'error');
-			showBPInstallGuide();
-		},
-		'printer'
-	);
-}
-
-/** normalize device list — รองรับทั้ง array และ {printer:[]} */
-function normalizeDeviceList(raw) {
-	if (Array.isArray(raw)) return raw;
-	if (raw && raw.printer) return raw.printer;
-	if (raw && typeof raw === 'object') return Object.values(raw).flat();
-	return [];
-}
-
-/* ============================================================
-   findAllPrinters — กดปุ่ม "ค้นหาทั้งหมด"
-   ============================================================ */
-function findAllPrinters() {
-	if (!checkBP()) return;
-	log('BrowserPrint.getLocalDevices()...', 'info');
-	setStatus('กำลังค้นหา...', 'connecting');
-	document.getElementById('btnFindAll').disabled = true;
-
-	BrowserPrint.getLocalDevices(
-		function(deviceList) {
-			document.getElementById('btnFindAll').disabled = false;
-			const list = normalizeDeviceList(deviceList);
-			allDevices = list;
-			populateDropdown(list);
-
-			if (list.length === 0) {
-				log('ไม่พบเครื่องพิมพ์', 'warn');
-				setStatus('ไม่พบเครื่องพิมพ์', 'error');
-				showBPInstallGuide();
-				return;
-			}
-			log('พบ ' + list.length + ' เครื่อง', 'ok');
-			setStatus('พบ ' + list.length + ' เครื่อง — เลือกแล้วกด เชื่อมต่อ', 'ok');
-			if (list.length === 1) activateDevice(list[0]);
-		},
-		function(err) {
-			document.getElementById('btnFindAll').disabled = false;
-			log('Error: ' + (err || 'BrowserPrint ไม่ตอบ'), 'error');
-			setStatus('เชื่อมต่อไม่สำเร็จ', 'error');
-			showBPInstallGuide();
-		},
-		'printer'
-	);
-}
-
-/* ============================================================
-   connectSelected — เชื่อมต่อจาก dropdown
-   ============================================================ */
-function connectSelected() {
-	const sel = document.getElementById('selected_device');
-	const uid = sel.value;
-	if (!uid) { alert('กรุณาเลือกเครื่องพิมพ์ก่อน'); return; }
-
-	const device = allDevices.find(d => d.uid === uid);
-	if (device) { activateDevice(device); return; }
-
-	/* ไม่มีใน cache → ค้นหาใหม่แล้ว match */
-	BrowserPrint.getLocalDevices(function(deviceList) {
-		const list = normalizeDeviceList(deviceList);
-		allDevices = list;
-		const d = list.find(x => x.uid === uid);
-		if (d) activateDevice(d);
-		else { log('ไม่พบ device uid: ' + uid, 'error'); findAllPrinters(); }
-	}, err => log('Error: '+err,'error'), 'printer');
-}
-
-/* ============================================================
-   findAndConnectByMac — ค้นหาและเชื่อมต่อด้วย MAC Address
-   flow: getLocalDevices → match uid → activateDevice
-         ถ้าไม่พบ → getDefaultDevice → fallback dropdown
-   ============================================================ */
-function findAndConnectByMac() {
-	const mac = document.getElementById('txtMac').value.trim().toUpperCase();
-	if (mac.length !== 17 || !/^([0-9A-F]{2}:){5}[0-9A-F]{2}$/.test(mac)) {
-		alert('MAC Address ไม่ถูกต้อง\nรูปแบบ: XX:XX:XX:XX:XX:XX\nเช่น AC:3F:A4:11:22:33');
-		return;
+		}, function(error) {
+			log('ไม่สามารถติดต่อ Browser Print Service ได้ (เปิดหรือยัง?)', 'error');
+			setStatus(false, "Service Offline");
+		});
 	}
-	if (!checkBP()) return;
 
-	try { localStorage.setItem('moda_mac', mac); } catch(e){}
-	log('ค้นหา MAC: ' + mac + ' ผ่าน BrowserPrint.getLocalDevices()...', 'info');
-	setStatus('กำลังค้นหา ' + mac + '...', 'connecting');
-	document.getElementById('btnFindMac').disabled = true;
-
-	BrowserPrint.getLocalDevices(
-		function(deviceList) {
-			document.getElementById('btnFindMac').disabled = false;
-			const list = normalizeDeviceList(deviceList);
-			allDevices = list;
-			populateDropdown(list);
-
-			if (list.length === 0) {
-				log('ไม่พบเครื่องพิมพ์เลย', 'error');
-				showBPInstallGuide(); return;
+	// ค้นหาเครื่องพิมพ์ทั้งหมดที่เชื่อมต่ออยู่
+	function findPrinters() {
+		log('กำลังค้นหาเครื่องพิมพ์...');
+		
+		BrowserPrint.getLocalDevices(function(devices) {
+			const printers = devices.filter(d => d.deviceType === 'printer');
+			if (printers.length > 0) {
+				// ในที่นี้เลือกตัวแรก หรือให้ผู้ใช้เลือก (ตัวอย่างนี้เลือกตัวแรกอัตโนมัติ)
+				selectedDevice = printers[0];
+				document.getElementById('txtPrinterName').value = selectedDevice.name;
+				setStatus(true, "พบเครื่องพิมพ์: " + selectedDevice.name);
+				log(`พบเครื่องพิมพ์ทั้งหมด ${printers.length} เครื่อง`, 'success');
+			} else {
+				log('ไม่พบเครื่องพิมพ์ที่เชื่อมต่อผ่าน USB หรือ Network', 'warning');
 			}
+		}, function(error) {
+			log('เกิดข้อผิดพลาดในการค้นหาเครื่องพิมพ์: ' + error, 'error');
+		}, "printer");
+	}
 
-			const matched = matchDeviceByMac(list, mac);
-			if (matched) {
-				log('MAC ตรง: ' + matched.name + ' uid=' + matched.uid, 'ok');
-				activateDevice(matched); return;
-			}
-
-			/* ไม่พบ MAC → ลอง getDefaultDevice */
-			log('ไม่พบ MAC ใน list — ลอง getDefaultDevice()', 'warn');
-			BrowserPrint.getDefaultDevice('printer',
-				function(def) {
-					if (def && def.uid) {
-						log('ใช้ Default Device: ' + def.name, 'ok');
-						activateDevice(def);
-					} else {
-						log('ไม่พบ Default — เลือก device จาก dropdown', 'warn');
-						setStatus('เลือกเครื่องพิมพ์จาก dropdown', 'connecting');
-						showStatusBox('\u26A0\uFE0F ไม่พบ MAC <b>' + mac + '</b> — กรุณาเลือกจาก dropdown แล้วกด <b>เชื่อมต่อที่เลือก</b>', false);
-					}
-				},
-				function() {
-					setStatus('เลือกเครื่องพิมพ์จาก dropdown', 'connecting');
-				}
-			);
-		},
-		function(err) {
-			document.getElementById('btnFindMac').disabled = false;
-			log('BrowserPrint error: ' + (err || 'ไม่ตอบ'), 'error');
-			setStatus('BrowserPrint ไม่ตอบ', 'error');
-			showBPInstallGuide();
-		},
-		'printer'
-	);
-}
-
-/** match device จาก MAC — เทียบ uid และชื่อ */
-function matchDeviceByMac(list, mac) {
-	const macClean = mac.replace(/:/g, '').toLowerCase();
-	return list.find(d => {
-		const uid  = (d.uid  || '').replace(/[^a-f0-9]/gi, '').toLowerCase();
-		const name = (d.name || '').replace(/[^a-f0-9]/gi, '').toLowerCase();
-		return uid === macClean
-			|| uid.endsWith(macClean.slice(-6))
-			|| macClean.endsWith(uid.slice(-6))
-			|| name.includes(macClean.slice(-6));
-	});
-}
-
-/* ============================================================
-   activateDevice — เปิดใช้งาน device + ตรวจสถานะ
-   ============================================================ */
-function activateDevice(device) {
-	bpDevice = device;
-	setBPReady(true);
-	showBPDeviceCard(device);
-	document.getElementById('btnDisBP').style.display = '';
-	setStatus('\u{1F5A8}\uFE0F ' + device.name + ' — เชื่อมต่อแล้ว', 'ok');
-	log('เชื่อมต่อ: ' + device.name + ' | uid=' + device.uid + ' | conn=' + device.connection, 'ok');
-	populateDropdownAndSelect(device);
-	checkDeviceStatus(device);
-}
-
-/** ตรวจสถานะ — ใช้ Zebra.Printer.getStatus() ถ้ามี ไม่งั้น fallback ~HQES */
-function checkDeviceStatus(device) {
-	if (typeof Zebra !== 'undefined' && Zebra.Printer) {
-		log('ใช้ Zebra.Printer.getStatus()...', 'info');
-		try {
-			zebraPrinter = new Zebra.Printer(device);
-			zebraPrinter.getStatus(
-				function(status) {
-					const msg   = status.getMessage();
-					const ready = status.isPrinterReady();
-					log('Zebra Status: ' + msg, ready ? 'ok' : 'warn');
-					document.getElementById('bpDeviceStatus').textContent = msg;
-					showStatusBox((ready ? '\u{1F7E2}' : '\u{1F7E1}') + ' <b>Status:</b> ' + msg, ready);
-				},
-				function(err) { log('getStatus error — fallback HQES', 'warn'); checkStatusHQES(device); }
-			);
+	// ฟังก์ชันส่ง ZPL ไปพิมพ์
+	function printZpl() {
+		if (!selectedDevice) {
+			log('กรุณาเลือกเครื่องพิมพ์ก่อน', 'error');
 			return;
-		} catch(e) {
-			log('Zebra.Printer error: ' + e.message, 'warn');
 		}
-	}
-	checkStatusHQES(device);
-}
 
-/** ตรวจสถานะด้วย device.sendThenRead('~HQES') — base API */
-function checkStatusHQES(device) {
-	log('device.sendThenRead("~HQES")...', 'info');
-	device.sendThenRead('~HQES',
-		function(resp) {
-			const r = parseHQES(resp);
-			log('HQES: ' + r.message, r.ready ? 'ok' : 'warn');
-			document.getElementById('bpDeviceStatus').textContent = r.message;
-			showStatusBox((r.ready ? '\u{1F7E2}' : '\u{1F7E1}') + ' <b>Status:</b> ' + r.message, r.ready);
-		},
-		function() {
-			/* Bluetooth Classic มักไม่ตอบ read → ถือว่า Ready */
-			log('ไม่ได้รับตอบจาก ~HQES (Bluetooth Classic) — ถือว่า Ready', 'warn');
-			document.getElementById('bpDeviceStatus').textContent = 'Ready';
-			showStatusBox('\u{1F7E2} <b>Status:</b> Ready — พร้อมพิมพ์', true);
-		}
-	);
-}
+		const zpl = document.getElementById('txtZpl').value;
+		log('กำลังส่งข้อมูลไปยัง ' + selectedDevice.name + '...');
 
-/** Parse ~HQES response ตาม Zebra bit spec */
-function parseHQES(t) {
-	if (!t || t.length < 90) return { ready: true, message: 'Ready to Print' };
-	const m = []; let ok = false;
-	if (t[70]==='0') { ok=true; m.push('Ready to Print'); }
-	if (t[88]==='1') m.push('กระดาษหมด');
-	if (t[88]==='2') m.push('Ribbon หมด');
-	if (t[88]==='4') m.push('ฝาเปิด');
-	if (t[88]==='8') m.push('Cutter Fault');
-	if (t[87]==='1') m.push('Printhead ร้อน');
-	if (t[87]==='2') m.push('Motor ร้อน');
-	if (t[87]==='4') m.push('Printhead Fault');
-	if (t[84]==='1') m.push('Printer Paused');
-	if (!ok && !m.length) m.push('Unknown Error');
-	return { ready: ok, message: m.join(', ') };
-}
-
-/* ============================================================
-   printZplBP — พิมพ์ ZPL
-   ลำดับ:
-     1. Zebra.Printer.isPrinterReady() → write()   [ถ้ามี Zebra lib]
-     2. device.send(zpl, success, error)             [base API fallback]
-   ============================================================ */
-function printZplBP() {
-	if (!bpDevice) { alert('กรุณาเชื่อมต่อเครื่องพิมพ์ก่อน'); return; }
-	const zpl = document.getElementById('txtZpl').value.trim();
-	if (!zpl)  { alert('กรุณาใส่ ZPL'); return; }
-
-	log('ส่ง ZPL (' + zpl.length + ' bytes) → ' + bpDevice.name, 'info');
-	showProgress(30);
-	setStatus('กำลังพิมพ์...', 'connecting');
-
-	/* Path A: Zebra.Printer Promise API */
-	if (zebraPrinter && typeof zebraPrinter.isPrinterReady === 'function') {
-		zebraPrinter.isPrinterReady()
-			.then(function()  { return zebraPrinter.write(zpl); })
-			.then(function()  { onPrintSuccess(); })
-			.catch(function(e){ log('Zebra.write fail: '+e+' → fallback device.send()', 'warn'); sendViaBaseAPI(zpl); });
-		return;
+		// device.send(data, success, error)
+		selectedDevice.send(zpl, function(success) {
+			log('ส่งข้อมูลการพิมพ์สำเร็จ!', 'success');
+		}, function(error) {
+			log('การพิมพ์ล้มเหลว: ' + error, 'error');
+		});
 	}
 
-	/* Path B: BrowserPrint base API — device.send(data, successCb, errorCb) */
-	sendViaBaseAPI(zpl);
-}
-
-/** device.send() — Official BrowserPrint base API */
-function sendViaBaseAPI(zpl) {
-	bpDevice.send(
-		zpl,
-		function()   { onPrintSuccess(); },
-		function(err){ onPrintError(err); }
-	);
-}
-
-function onPrintSuccess() {
-	showProgress(100); setTimeout(()=>showProgress(-1), 800);
-	log('พิมพ์สำเร็จ ✓', 'ok');
-	setStatus('\u{1F5A8}\uFE0F พิมพ์สำเร็จ', 'ok');
-	document.getElementById('bpDeviceStatus').textContent = 'พิมพ์สำเร็จ ✓';
-}
-
-function onPrintError(err) {
-	showProgress(-1);
-	log('พิมพ์ล้มเหลว: ' + (err||'Unknown'), 'error');
-	setStatus('พิมพ์ไม่สำเร็จ', 'error');
-	alert('พิมพ์ไม่สำเร็จ:\n' + (err||'Unknown error'));
-}
-
-/* ============================================================
-   disconnectBP / dropdown / install guide
-   ============================================================ */
-function disconnectBP() {
-	hideBPDeviceCard();
-	document.getElementById('btnDisBP').style.display = 'none';
-	setStatus('ตัดการเชื่อมต่อแล้ว', 'idle');
-	log('Disconnected', 'info');
-}
-
-function populateDropdown(list) {
-	const sel = document.getElementById('selected_device');
-	sel.innerHTML = '<option value="">-- เลือกเครื่องพิมพ์ --</option>';
-	list.forEach(d => {
-		const o = document.createElement('option');
-		o.value = d.uid;
-		o.text  = d.name + ' (' + (d.connection||'BT').toUpperCase() + ')';
-		sel.add(o);
-	});
-}
-
-function populateDropdownAndSelect(device) {
-	const sel = document.getElementById('selected_device');
-	let found = false;
-	for (let i=0; i<sel.options.length; i++) {
-		if (sel.options[i].value === device.uid) { sel.selectedIndex=i; found=true; break; }
-	}
-	if (!found) {
-		const o = document.createElement('option');
-		o.value = device.uid;
-		o.text  = device.name + ' (' + (device.connection||'BT').toUpperCase() + ')';
-		sel.add(o); sel.value = device.uid;
-	}
-}
-
-function showBPInstallGuide() {
-	showStatusBox(`<b>\u274C BrowserPrint ไม่ตอบสนอง</b><br>
-		<b>1.</b> ดาวน์โหลด <b>Zebra Browser Print App</b> สำหรับ Android จาก
-		<a href="https://www.zebra.com/us/en/support-downloads/printer-software/browser-print.html" target="_blank" style="color:#0066cc">zebra.com</a><br>
-		<b>2.</b> เปิด App ให้รันอยู่เบื้องหลัง<br>
-		<b>3.</b> Pair เครื่องพิมพ์ใน <b>Android Settings &#x2192; Bluetooth</b> ก่อน<br>
-		<b>4.</b> กด <b>"ค้นหาทั้งหมด"</b> อีกครั้ง<br>
-		<small style="color:#888">&#x26A0;&#xFE0F; BrowserPrint รองรับเฉพาะ <b>Bluetooth Classic</b> (ไม่ใช่ BLE)</small>`, false);
-}
-
-/* ============================================================
-   PDF Print
-   ============================================================ */
-async function generatePDF() {
-	const labelImg = document.getElementById('labelPreview');
-	if (!labelImg.src || labelImg.src === location.href || labelImg.naturalWidth === 0) {
-		alert('กรุณากด Preview ก่อนพิมพ์'); return;
-	}
-	const wIn = parseFloat(document.getElementById('txtW').value)||4;
-	const hIn = parseFloat(document.getElementById('txtH').value)||6;
-	const DPI = 203, pxW = Math.round(wIn*DPI), pxH = Math.round(hIn*DPI);
-	log('สร้าง PDF ' + wIn + '×' + hIn + ' นิ้ว...', 'info');
-	try {
-		const canvas = document.getElementById('pdfCanvas');
-		canvas.width = pxW; canvas.height = pxH;
-		const ctx = canvas.getContext('2d');
-		ctx.fillStyle='#fff'; ctx.fillRect(0,0,pxW,pxH);
-		const img = new Image(); img.crossOrigin='anonymous';
-		await new Promise((res,rej)=>{ img.onload=res; img.onerror=rej; img.src=labelImg.src; });
-		ctx.drawImage(img,0,0,pxW,pxH);
-		const imgData = canvas.toDataURL('image/jpeg',0.97);
-		const pdf     = buildPDF(imgData, wIn, hIn, pxW, pxH);
-		const blob    = new Blob([pdf],{type:'application/pdf'});
-		const url     = URL.createObjectURL(blob);
-		const pw = window.open(url,'_blank');
-		if (pw) { pw.onload = function(){ pw.focus(); pw.print(); }; }
-		else {
-			const fr = document.getElementById('printFrame');
-			fr.src = url;
-			fr.onload = function(){ fr.contentWindow.focus(); fr.contentWindow.print(); };
-		}
-		log('เปิดหน้าพิมพ์ PDF ✓','ok'); setStatus('เปิดหน้าพิมพ์แล้ว','ok');
-		setTimeout(()=>URL.revokeObjectURL(url),60000);
-	} catch(e) {
-		log('PDF Error: '+e.message,'error'); alert('สร้าง PDF ไม่สำเร็จ:\n'+e.message);
-	}
-}
-function buildPDF(jpegDataUrl, wIn, hIn, pxW, pxH) {
-	const ptW=Math.round(wIn*72), ptH=Math.round(hIn*72);
-	const b64=jpegDataUrl.split(',')[1], imgBytes=atob(b64), imgLen=imgBytes.length;
-	const h='%PDF-1.4\n%\xe2\xe3\xcf\xd3\n';
-	const o1='1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n';
-	const o2='2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n';
-	const o3=`3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${ptW} ${ptH}] /Contents 4 0 R /Resources << /XObject << /Im1 5 0 R >> >> >>\nendobj\n`;
-	const s4=`q\n${ptW} 0 0 ${ptH} 0 0 cm\n/Im1 Do\nQ\n`;
-	const o4=`4 0 obj\n<< /Length ${s4.length} >>\nstream\n${s4}\nendstream\nendobj\n`;
-	const o5=`5 0 obj\n<< /Type /XObject /Subtype /Image /Width ${pxW} /Height ${pxH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${imgLen} >>\nstream\n`;
-	const enc=new TextEncoder(); let off=h.length; const offs=[];
-	[o1,o2,o3,o4,o5].forEach((p,i)=>{ offs[i]=off; off+=p.length; if(i===4) off+=imgLen+'\nendstream\nendobj\n'.length; });
-	let xref=`xref\n0 6\n0000000000 65535 f \n`; offs.forEach(o=>{ xref+=String(o).padStart(10,'0')+' 00000 n \n'; });
-	const trailer=`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${off}\n%%EOF`;
-	const t1=enc.encode(h+o1+o2+o3+o4+o5), ia=new Uint8Array(imgLen);
-	for(let i=0;i<imgLen;i++) ia[i]=imgBytes.charCodeAt(i);
-	const t2=enc.encode('\nendstream\nendobj\n'+xref+trailer);
-	const tot=new Uint8Array(t1.length+ia.length+t2.length);
-	tot.set(t1,0); tot.set(ia,t1.length); tot.set(t2,t1.length+ia.length);
-	return tot;
-}
-
-/* ============================================================
-   Print Auto / Preview
-   ============================================================ */
-function printAuto() {
-	if (currentMethod === 'bp') printZplBP();
-	else generatePDF();
-}
-
-function updatePreview() {
-	const zpl = document.getElementById('txtZpl').value;
-	const w   = document.getElementById('txtW').value || 4;
-	const h   = document.getElementById('txtH').value || 6;
-	const url = `https://api.labelary.com/v1/printers/8dpmm/labels/${w}x${h}/0/${encodeURIComponent(zpl)}`;
-	document.getElementById('labelPreview').src = url;
-	log('Preview ' + w + '×' + h + ' นิ้ว');
-	try { localStorage.setItem('moda_zpl',zpl); localStorage.setItem('moda_w',w); localStorage.setItem('moda_h',h); } catch(e){}
-}
-
-/* ============================================================
-   Init
-   ============================================================ */
-window.onload = function() {
-	logEl = document.getElementById('log');
-	try {
-		const z = localStorage.getItem('moda_zpl'); if(z) document.getElementById('txtZpl').value = z;
-		const w = localStorage.getItem('moda_w');   if(w) document.getElementById('txtW').value   = w;
-		const h = localStorage.getItem('moda_h');   if(h) document.getElementById('txtH').value   = h;
-		const m = localStorage.getItem('moda_mac'); if(m) document.getElementById('txtMac').value = m;
-	} catch(e){}
-
-	log('MODA BT Print v4 | BrowserPrint API', 'info');
-
-	// รอ BrowserPrint.js โหลด แล้ว setup
-	setTimeout(setupBrowserPrint, 800);
-
-	// ถ้ามี MAC บันทึกไว้ → ค้นหาอัตโนมัติหลังจาก BrowserPrint พร้อม
-	const savedMac = (() => { try{ return localStorage.getItem('moda_mac'); }catch(e){return null;} })();
-	if (savedMac) {
-		log('พบ MAC บันทึกไว้: ' + savedMac + ' — เชื่อมต่ออัตโนมัติ...', 'info');
-		setTimeout(() => findAndConnectByMac(), 1500);
+	/* ============================================================
+	   Preview logic
+	   ============================================================ */
+	function updatePreview() {
+		const zpl = document.getElementById('txtZpl').value;
+		// ใช้ Labelary API ในการ Render ZPL เป็นรูปภาพ (สมมติ 4x6 นิ้ว)
+		const url = `https://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/${encodeURIComponent(zpl)}`;
+		document.getElementById('labelPreview').src = url;
+		log('อัปเดตตัวอย่างป้ายพิมพ์แล้ว');
 	}
 
-	updatePreview();
-};
+	window.onload = function() {
+		log('เริ่มต้นโปรแกรม MODA Zebra Print');
+		// ตั้งเวลาหน่วงเพื่อให้ BrowserPrint.js โหลดเสร็จก่อน
+		setTimeout(setupBrowserPrint, 1000);
+	};
 </script>
+
 </body>
 </html>
