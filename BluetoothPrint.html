@@ -270,19 +270,19 @@
 	<div id="panel-sys" style="display:none;">
 		<div class="card">
 			<div class="section-title"><i class="fas fa-file-pdf"></i> PDF Print</div>
-			<div class="ok-box">✅ สร้าง PDF ขนาดตรงตาม Label (เช่น 4×6 นิ้ว) แล้วเปิดให้ Android เลือกพิมพ์หรือบันทึก</div>
+			<div class="ok-box">✅ สร้าง PDF ขนาดตรงตาม Label แล้วเปิดหน้าพิมพ์ Android ขึ้นมาทันที</div>
 			<div class="steps">
 				<div class="step-item"><div class="step-num">1</div><div>ตั้งขนาดกระดาษใน <b>ตั้งค่าหน้ากระดาษ</b> ด้านล่าง</div></div>
 				<div class="step-item"><div class="step-num">2</div><div>กด <b>Preview</b> เพื่อสร้างภาพ Label</div></div>
-				<div class="step-item"><div class="step-num">3</div><div>กด <b>สร้าง PDF &amp; พิมพ์</b> — PDF ขนาดถูกต้องจะเปิดในแถบใหม่</div></div>
-				<div class="step-item"><div class="step-num">4</div><div>Android จะแสดง dialog ให้เลือก <b>เครื่องพิมพ์ Zebra</b> หรือ <b>บันทึก PDF</b></div></div>
+				<div class="step-item"><div class="step-num">3</div><div>กด <b>พิมพ์</b> — หน้าพิมพ์ Android จะเปิดขึ้นมาอัตโนมัติ</div></div>
 			</div>
 			<div class="btn-grid" style="margin-top:12px;">
 				<button class="btn btn-secondary" onclick="updatePreview()"><i class="fas fa-eye"></i> Preview</button>
-				<button class="btn btn-danger"    onclick="generatePDF()"><i class="fas fa-file-pdf"></i> สร้าง PDF &amp; พิมพ์</button>
+				<button class="btn btn-danger"    onclick="generatePDF()"><i class="fas fa-print"></i> พิมพ์</button>
 			</div>
-			<!-- hidden canvas for PDF generation -->
+			<!-- hidden elements for PDF generation -->
 			<canvas id="pdfCanvas" style="display:none;"></canvas>
+			<iframe id="printFrame" style="display:none; width:0; height:0; border:none;"></iframe>
 		</div>
 	</div>
 
@@ -629,20 +629,20 @@ async function printZplBLE() {
 async function generatePDF() {
 	const labelImg = document.getElementById('labelPreview');
 	if (!labelImg.src || labelImg.src === location.href || labelImg.naturalWidth === 0) {
-		alert('กรุณากด Preview ก่อนสร้าง PDF');
+		alert('กรุณากด Preview ก่อนพิมพ์');
 		return;
 	}
 
 	const wIn = parseFloat(document.getElementById('txtW').value) || 4;
 	const hIn = parseFloat(document.getElementById('txtH').value) || 6;
-	const DPI = 203; // Zebra standard DPI
+	const DPI = 203;
 	const pxW = Math.round(wIn * DPI);
 	const pxH = Math.round(hIn * DPI);
 
-	log('กำลังสร้าง PDF ' + wIn + '×' + hIn + ' นิ้ว (' + pxW + '×' + pxH + 'px)...', 'info');
+	log('กำลังสร้าง PDF ' + wIn + '×' + hIn + ' นิ้ว...', 'info');
 
 	try {
-		// Draw label image onto canvas at exact DPI size
+		// Draw label onto canvas
 		const canvas  = document.getElementById('pdfCanvas');
 		canvas.width  = pxW;
 		canvas.height = pxH;
@@ -650,7 +650,6 @@ async function generatePDF() {
 		ctx.fillStyle = '#ffffff';
 		ctx.fillRect(0, 0, pxW, pxH);
 
-		// Load image onto canvas (handle CORS via labelary)
 		const img = new Image();
 		img.crossOrigin = 'anonymous';
 		await new Promise((resolve, reject) => {
@@ -661,27 +660,34 @@ async function generatePDF() {
 		ctx.drawImage(img, 0, 0, pxW, pxH);
 
 		const imgData = canvas.toDataURL('image/jpeg', 0.97);
+		const pdf     = buildPDF(imgData, wIn, hIn, pxW, pxH);
+		const blob    = new Blob([pdf], { type: 'application/pdf' });
+		const url     = URL.createObjectURL(blob);
 
-		// Build minimal valid PDF manually (no library needed)
-		const pdf = buildPDF(imgData, wIn, hIn, pxW, pxH);
-		const blob = new Blob([pdf], { type: 'application/pdf' });
-		const url  = URL.createObjectURL(blob);
+		// Open PDF in new window then trigger print dialog immediately
+		const pw = window.open(url, '_blank');
+		if (pw) {
+			pw.onload = function() {
+				pw.focus();
+				pw.print();
+			};
+		} else {
+			// Fallback: popup blocked — embed in iframe and print
+			const iframe = document.getElementById('printFrame');
+			iframe.src = url;
+			iframe.onload = function() {
+				iframe.contentWindow.focus();
+				iframe.contentWindow.print();
+			};
+		}
 
-		// Open in new tab — Android will show Print/Save dialog
-		const link = document.createElement('a');
-		link.href     = url;
-		link.target   = '_blank';
-		link.download = 'label_' + wIn + 'x' + hIn + 'in.pdf';
-		link.click();
-
-		log('PDF สร้างสำเร็จ — ' + wIn + '×' + hIn + ' นิ้ว ✓', 'ok');
-		setStatus('PDF พร้อมแล้ว — กดพิมพ์ในแถบที่เปิด', 'ok');
-
-		setTimeout(() => URL.revokeObjectURL(url), 30000);
+		log('เปิดหน้าพิมพ์ — ' + wIn + '×' + hIn + ' นิ้ว ✓', 'ok');
+		setStatus('เปิดหน้าพิมพ์แล้ว', 'ok');
+		setTimeout(() => URL.revokeObjectURL(url), 60000);
 
 	} catch(e) {
 		log('PDF Error: ' + e.message, 'error');
-		alert('สร้าง PDF ไม่สำเร็จ:\n' + e.message + '\n\nลองกด Preview ใหม่ก่อน');
+		alert('สร้าง PDF ไม่สำเร็จ:\n' + e.message);
 	}
 }
 
